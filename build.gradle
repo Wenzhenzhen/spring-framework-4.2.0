@@ -7,8 +7,15 @@ buildscript {
 		classpath("org.asciidoctor:asciidoctor-gradle-plugin:1.5.2")
 		classpath("io.spring.gradle:docbook-reference-plugin:0.3.1")
 		classpath("ws.antonov.gradle.plugins:gradle-plugin-protobuf:0.9.1")
+		classpath ("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.2.1")
 	}
 }
+plugins {
+	id "org.sonarqube" version "2.6.2"
+}
+
+apply plugin: "org.sonarqube"
+
 
 ext {
 	linkHomepage = 'https://projects.spring.io/spring-framework'
@@ -238,6 +245,7 @@ configure(subprojects - project(":spring-build-src")) { subproject ->
 
 		options.memberLevel = org.gradle.external.javadoc.JavadocMemberLevel.PROTECTED
 		options.author = true
+		options.encoding = "UTF-8"
 		options.header = project.name
 		options.links(project.ext.javadocLinks)
 		options.addStringOption('Xdoclint:none', '-quiet')
@@ -418,6 +426,7 @@ project("spring-aop") {
 		compile(files(project(":spring-core").objenesisRepackJar))
 		compile("aopalliance:aopalliance:1.0")
 		optional("org.aspectj:aspectjweaver:${aspectjVersion}")
+		optional("org.springframework:spring-aop:4.2.0")
 		optional("commons-pool:commons-pool:1.6")
 		optional("org.apache.commons:commons-pool2:2.4.1")
 		optional("com.jamonapi:jamon:2.81")

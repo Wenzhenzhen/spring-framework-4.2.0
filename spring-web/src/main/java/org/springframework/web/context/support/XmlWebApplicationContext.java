@@ -22,6 +22,8 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.ResourceEntityResolver;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
+import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.context.support.AbstractRefreshableApplicationContext;
 
 /**
  * {@link org.springframework.web.context.WebApplicationContext} implementation
@@ -76,21 +78,28 @@ public class XmlWebApplicationContext extends AbstractRefreshableWebApplicationC
 	 * @see org.springframework.beans.factory.xml.XmlBeanDefinitionReader
 	 * @see #initBeanDefinitionReader
 	 * @see #loadBeanDefinitions
+	 *
+	 * {@link AbstractApplicationContext#refresh()}->
+     * {@link AbstractApplicationContext#obtainFreshBeanFactory()}->
+     * {@link AbstractApplicationContext#refreshBeanFactory()}->(抽象方法，未实现调用子类中的方法)
+     * {@link AbstractRefreshableApplicationContext#refreshBeanFactory()} ->
+     * {@link AbstractRefreshableApplicationContext#loadBeanDefinitions(DefaultListableBeanFactory)} ->(抽象方法，未实现调用子类中的方法)
+     * {@link XmlWebApplicationContext#loadBeanDefinitions(DefaultListableBeanFactory)}
+     * Spring容器初始化的过程从refresh()至此的调用链
 	 */
 	@Override
 	protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws BeansException, IOException {
 		// Create a new XmlBeanDefinitionReader for the given BeanFactory.
 		XmlBeanDefinitionReader beanDefinitionReader = new XmlBeanDefinitionReader(beanFactory);
 
-		// Configure the bean definition reader with this context's
-		// resource loading environment.
+		// 使用此上下文的资源加载环境配置bean定义阅读器。
 		beanDefinitionReader.setEnvironment(getEnvironment());
 		beanDefinitionReader.setResourceLoader(this);
 		beanDefinitionReader.setEntityResolver(new ResourceEntityResolver(this));
 
-		// Allow a subclass to provide custom initialization of the reader,
-		// then proceed with actually loading the bean definitions.
+		//允许子类自定义初始化beanDefinitionReader
 		initBeanDefinitionReader(beanDefinitionReader);
+		//实际加载bean定义，获取配置文件，解析配置文件
 		loadBeanDefinitions(beanDefinitionReader);
 	}
 
@@ -119,9 +128,11 @@ public class XmlWebApplicationContext extends AbstractRefreshableWebApplicationC
 	 * @see #getResourcePatternResolver
 	 */
 	protected void loadBeanDefinitions(XmlBeanDefinitionReader reader) throws IOException {
+		//获取配置文件
 		String[] configLocations = getConfigLocations();
 		if (configLocations != null) {
 			for (String configLocation : configLocations) {
+				//解析配置文件
 				reader.loadBeanDefinitions(configLocation);
 			}
 		}

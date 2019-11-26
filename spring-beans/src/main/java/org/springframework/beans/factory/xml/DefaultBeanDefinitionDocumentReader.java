@@ -114,15 +114,13 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
      * Register each bean definition within the given root {@code <beans/>} element.
      */
     protected void doRegisterBeanDefinitions(Element root) {
-        // Any nested <beans> elements will cause recursion in this method. In
-        // order to propagate and preserve <beans> default-* attributes correctly,
-        // keep track of the current (parent) delegate, which may be null. Create
-        // the new (child) delegate with a reference to the parent for fallback purposes,
-        // then ultimately reset this.delegate back to its original (parent) reference.
-        // this behavior emulates a stack of delegates without actually necessitating one.
+        //任何嵌套的<beans>元素都将导致此方法中的递归。
+        // 为了正确传播和保留<beans> default- *属性，请跟踪当前（父）委托，该委托可以为null。
+        // 创建一个新的（子）委托并引用其父项以进行回退，然后最终将其重置。将其恢复为原始（父）引用。
+        // 此行为模拟了一组委托而实际上并不需要。
         BeanDefinitionParserDelegate parent = this.delegate;
         this.delegate = createDelegate(getReaderContext(), root, parent);
-
+        //程序首先处理 profile属性，profile主要用于我们切换环境，比如切换开发、测试、生产环境，非常方便。然后调用
         if (this.delegate.isDefaultNamespace(root)) {
             String profileSpec = root.getAttribute(PROFILE_ATTRIBUTE);
             if (StringUtils.hasText(profileSpec)) {
@@ -134,6 +132,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
             }
         }
 
+        // preProcessXml() 和 postProcessXml() 方法来进行前、后处理，目前这两个方法都是空实现，交由子类来实现。
         //模板方法，可用户自定义
         preProcessXml(root);
         parseBeanDefinitions(root, this.delegate);
@@ -168,6 +167,9 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
                 Node node = nl.item(i);
                 if (node instanceof Element) {
                     Element ele = (Element) node;
+                    //这里有两个分支。两种方式的读取和解析都存在较大的差异，所以采用不同的解析方法
+                    //一个是处理默认的节点(import、alias、bean、beans)
+                    //一个是处理自定义注解方式：<tx:annotation-driven>
                     if (delegate.isDefaultNamespace(ele)) {
                         parseDefaultElement(ele, delegate);//解析<beans/>标签下的子标签，如<import>,<bean>,<alias>,<beans>
                     } else {

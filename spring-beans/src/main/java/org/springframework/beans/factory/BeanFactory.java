@@ -105,6 +105,8 @@ import org.springframework.core.ResolvableType;
  * @see DisposableBean#destroy
  * @see org.springframework.beans.factory.support.RootBeanDefinition#getDestroyMethodName
  */
+//Spring bean容器的根接口，提供了IOC容器最基本的形式，给具体的IOC容器的实现提供了规范
+	//职责是：实例化、定位、配置应用程序中的对象及建立这些对象间的依赖
 public interface BeanFactory {
 
 	/**

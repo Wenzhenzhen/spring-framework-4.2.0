@@ -16,6 +16,8 @@
 
 package org.springframework.web.context;
 
+import org.springframework.context.support.AbstractApplicationContext;
+
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
@@ -38,6 +40,9 @@ import javax.servlet.ServletContextListener;
  * @see org.springframework.web.WebApplicationInitializer
  * @see org.springframework.web.util.Log4jConfigListener
  */
+
+//web.xml是webapp的入口，由web应用容器（如Tomcat）进行解析，其中就定义了Spring的监听器ContextLoaderListener
+    //contextInitialized就是Spring初始化的入口方法。
 public class ContextLoaderListener extends ContextLoader implements ServletContextListener {
 
 	/**
@@ -98,13 +103,14 @@ public class ContextLoaderListener extends ContextLoader implements ServletConte
 		super(context);
 	}
 
-
-	/**
-	 * Initialize the root web application context.
-	 * 主要是创建XmlWebApplicationContext，及对它的设置，和XmlWebApplicationContext中的ioc容器的启动
-	 */
-	@Override
-	public void contextInitialized(ServletContextEvent event) {
+  /**
+   * 初始化web应用上下文.是Spring初始化的入口方法:
+   * 主要是创建XmlWebApplicationContext，及对它的设置，和XmlWebApplicationContext中的ioc容器的启动;
+   * Spring还有一个入口，叫做org.springframework.web.servlet.DispatcherServlet，
+   * 它们之间是父子容器的关系，最终都会调用到同一个方法{@link AbstractApplicationContext#refresh()}
+   * */
+  @Override
+  public void contextInitialized(ServletContextEvent event) {
 		initWebApplicationContext(event.getServletContext());
 	}
 

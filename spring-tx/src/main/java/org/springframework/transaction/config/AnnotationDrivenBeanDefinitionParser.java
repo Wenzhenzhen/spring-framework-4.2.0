@@ -50,13 +50,16 @@ import org.springframework.transaction.interceptor.TransactionInterceptor;
  */
 class AnnotationDrivenBeanDefinitionParser implements BeanDefinitionParser {
 
-	/**
-	 * Parses the {@code <tx:annotation-driven/>} tag. Will
-	 * {@link AopNamespaceUtils#registerAutoProxyCreatorIfNecessary register an AutoProxyCreator}
-	 * with the container as necessary.
-	 */
-	@Override
-	public BeanDefinition parse(Element element, ParserContext parserContext) {
+  /**
+   * Parses the {@code <tx:annotation-driven/>} tag. Will {@link
+   * AopNamespaceUtils#registerAutoProxyCreatorIfNecessary register an AutoProxyCreator} with the
+   * container as necessary.
+   *
+   * spring事务源码解析
+   * 一、事务自定义标签的解析
+   */
+  @Override
+  public BeanDefinition parse(Element element, ParserContext parserContext) {
 		registerTransactionalEventListenerFactory(parserContext);
 		String mode = element.getAttribute("mode");
 		if ("aspectj".equals(mode)) {
@@ -96,11 +99,13 @@ class AnnotationDrivenBeanDefinitionParser implements BeanDefinitionParser {
 
 
 	/**
-	 * Inner class to just introduce an AOP framework dependency when actually in proxy mode.
+	 * 内部类，以便在实际处于代理模式时引入AOP框架的依赖项
+     * 此方法中注册了代理类以及支撑其整个事务功能的三个bean
 	 */
 	private static class AopAutoProxyConfigurer {
 
 		public static void configureAutoProxyCreator(Element element, ParserContext parserContext) {
+			//代理类的注册
 			AopNamespaceUtils.registerAutoProxyCreatorIfNecessary(parserContext, element);
 
 			String txAdvisorBeanName = TransactionManagementConfigUtils.TRANSACTION_ADVISOR_BEAN_NAME;

@@ -518,9 +518,13 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
     @Override
     public void refresh() throws BeansException, IllegalStateException {
+        //同步块，只允许一个线程处理，不支持并发
         synchronized (this.startupShutdownMonitor) {
-            // Prepare this context for refreshing.
-            prepareRefresh();
+          // 表示在真正做refresh操作之前需要准备做的事情：
+          // 1.设置Spring容器的启动时间，撤销关闭状态，开启活跃状态。
+          // 2.初始化属性源信息(Property)
+          // 3.验证环境信息里一些必须存在的属性
+          prepareRefresh();
 
             // Tell the subclass to refresh the internal bean factory.
             //创建了新的beanFactory，这时BeanDefinition已经注册完成
@@ -605,7 +609,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
         // Validate that all properties marked as required are resolvable
         // see ConfigurablePropertyResolver#setRequiredProperties
-        //确认所有被标记为required属性的properties被解析。
+        //确认所有被标记为required属性的properties被解析。验证环境信息里一些必须存在的属性
         getEnvironment().validateRequiredProperties();
 
         // Allow for the collection of early ApplicationEvents,

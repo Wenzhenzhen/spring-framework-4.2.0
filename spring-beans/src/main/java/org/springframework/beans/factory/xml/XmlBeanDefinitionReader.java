@@ -334,12 +334,13 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
         }
         if (!currentResources.add(encodedResource)) {   //向currentResources里面添加resource失败。
             throw new BeanDefinitionStoreException(
-                    "Detected cyclic loading of " + encodedResource + " - check your import definitions!");
-        }
+                "Detected cyclic loading of " + encodedResource + " - check your import definitions!");
+    }
         try {
+            //获取resources对象的输入流
             InputStream inputStream = encodedResource.getResource().getInputStream();
             try {
-//				把流包装成inputSource，InputSource类中封装了许多便于操作xml的方法。
+//				把流转换成成JDK的InputSource对象，InputSource类中封装了许多便于操作xml的方法。
                 InputSource inputSource = new InputSource(inputStream);
                 if (encodedResource.getEncoding() != null) {
                     inputSource.setEncoding(encodedResource.getEncoding());
@@ -513,9 +514,11 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
      * @see BeanDefinitionDocumentReader#registerBeanDefinitions
      */
     public int registerBeanDefinitions(Document doc, Resource resource) throws BeanDefinitionStoreException {
-        //创建一个DefaultBeanDefinitionDocumentReader对象。
+            //创建一个DefaultBeanDefinitionDocumentReader对象。
         BeanDefinitionDocumentReader documentReader = createBeanDefinitionDocumentReader();
         int countBefore = getRegistry().getBeanDefinitionCount();         //返回DefaultListableBeanFactory中beanDefinitionMap的size。
+        // createReaderContext(resource)若没有指定resolver会创建一个默认的{@link DefaultNamespaceHandlerResolver}.
+        //"META-INF/spring.handlers"这个文件名和路径就定义在这个类中
         documentReader.registerBeanDefinitions(doc, createReaderContext(resource));
         return getRegistry().getBeanDefinitionCount() - countBefore;
     }
@@ -554,6 +557,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
     /**
      * Create the default implementation of {@link NamespaceHandlerResolver} used if none is specified.
      * Default implementation returns an instance of {@link DefaultNamespaceHandlerResolver}.
+     * "META-INF/spring.handlers"这个文件名和路径就定义在这个类中
      */
     protected NamespaceHandlerResolver createDefaultNamespaceHandlerResolver() {
         return new DefaultNamespaceHandlerResolver(getResourceLoader().getClassLoader());

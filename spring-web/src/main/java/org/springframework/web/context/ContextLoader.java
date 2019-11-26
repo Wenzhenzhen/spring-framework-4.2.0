@@ -312,7 +312,7 @@ public class ContextLoader {
 			// it is available on ServletContext shutdown.
 			if (this.context == null) {
 				//创建XmlWebApplicationContext对象，作为mvc中的ApplicationContext
-				//先获取web.xml中的contextClass参数，若有就以这个参数的值创建，没有就创建ContextLoader.propertiex中配置的XmlWebApplicationContext类，反射实例化
+				//先获取web.xml中的contextClass参数，若有就以这个参数的值创建，没有就创建ContextLoader.properties中配置的XmlWebApplicationContext类，反射实例化
 				this.context = createWebApplicationContext(servletContext);     //传入servletContext是为了得到servletContext的contextClass。
 			}
 			if (this.context instanceof ConfigurableWebApplicationContext) {
@@ -379,6 +379,7 @@ public class ContextLoader {
 	 * @see ConfigurableWebApplicationContext
 	 */
 	protected WebApplicationContext createWebApplicationContext(ServletContext sc) {
+		//先获取web.xml中的contextClass参数，若有就以这个参数的值创建，没有就创建ContextLoader.properties中配置的XmlWebApplicationContext类，反射实例化
 		Class<?> contextClass = determineContextClass(sc);
 		//如果contextClass不是ConfigurableWebApplicationContext或者其子类。
 		if (!ConfigurableWebApplicationContext.class.isAssignableFrom(contextClass)) {
