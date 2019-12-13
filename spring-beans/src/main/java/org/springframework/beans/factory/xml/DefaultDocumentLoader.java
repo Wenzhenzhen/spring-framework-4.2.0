@@ -30,7 +30,7 @@ import org.xml.sax.InputSource;
 import org.springframework.util.xml.XmlValidationModeDetector;
 
 /**
- * Spring's default {@link DocumentLoader} implementation.
+ * {@link DocumentLoader} 的默认实现类.
  *
  * <p>Simply loads {@link Document documents} using the standard JAXP-configured
  * XML parser. If you want to change the {@link DocumentBuilder} that is used to
@@ -61,18 +61,20 @@ public class DefaultDocumentLoader implements DocumentLoader {
 
 
 	/**
-	 * Load the {@link Document} at the supplied {@link InputSource} using the standard JAXP-configured
-	 * XML parser.
+	 * 使用标准的JAXP配置的XML解析器将{@link Document}加载到提供的{@link InputSource}中。
 	 */
 	@Override
 	public Document loadDocument(InputSource inputSource, EntityResolver entityResolver,
 			ErrorHandler errorHandler, int validationMode, boolean namespaceAware) throws Exception {
 
+		//1.创建 DocumentBuilderFactory
 		DocumentBuilderFactory factory = createDocumentBuilderFactory(validationMode, namespaceAware);
 		if (logger.isDebugEnabled()) {
 			logger.debug("Using JAXP provider [" + factory.getClass().getName() + "]");
 		}
+		//再通过该 factory 创建 DocumentBuilder
 		DocumentBuilder builder = createDocumentBuilder(factory, entityResolver, errorHandler);
+		//最后解析 InputSource 返回 Document 对象。
 		return builder.parse(inputSource);
 	}
 

@@ -245,6 +245,9 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 		Assert.notEmpty(basePackages, "At least one base package must be specified");
 		Set<BeanDefinitionHolder> beanDefinitions = new LinkedHashSet<BeanDefinitionHolder>();
 		for (String basePackage : basePackages) {
+			// findCandidateComponents扫描包路径下的所有class文件，过滤有Component注解的类，转换成BeanDefinition对象，加入一个LinkedHashSet中。
+            //值得注意的是，Component不止是@Component，还有@Controller、@Service、@Repository，因为在这三个注解上面还有个@Component。
+            //这就相当于它们都是Component的子注解。
 			Set<BeanDefinition> candidates = findCandidateComponents(basePackage);
 			for (BeanDefinition candidate : candidates) {
 				ScopeMetadata scopeMetadata = this.scopeMetadataResolver.resolveScopeMetadata(candidate);
@@ -260,8 +263,10 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 					BeanDefinitionHolder definitionHolder = new BeanDefinitionHolder(candidate, beanName);
 					definitionHolder = AnnotationConfigUtils.applyScopedProxyMode(scopeMetadata, definitionHolder, this.registry);
 					beanDefinitions.add(definitionHolder);
-					//注册BeanDefinition
-					registerBeanDefinition(definitionHolder, this.registry);
+                    // 注册BeanDefinition 等同于下面两句：
+                    // this.beanDefinitionMap.put(beanName, beanDefinition);
+                    //this.beanDefinitionNames.add(beanName);
+                    registerBeanDefinition(definitionHolder, this.registry);
 				}
 			}
 		}

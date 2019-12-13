@@ -40,6 +40,11 @@ public abstract class AttributeAccessorSupport implements AttributeAccessor, Ser
 	private final Map<String, Object> attributes = new LinkedHashMap<String, Object>(0);
 
 
+	//AttributeAccessorSupport 是接口 AttributeAccessor 的实现者。
+	// AttributeAccessor 接口定义了与其他对象的元数据进行连接和访问的约定，
+	// 可以通过该接口对属性进行获取、设置、删除操作。
+	// 设置元数据后，则可以通过 getAttribute() 获取,如下：
+
 	@Override
 	public void setAttribute(String name, Object value) {
 		Assert.notNull(name, "Name must not be null");
@@ -50,6 +55,8 @@ public abstract class AttributeAccessorSupport implements AttributeAccessor, Ser
 			removeAttribute(name);
 		}
 	}
+
+	// 设置元数据后，则可以通过 getAttribute() 获取,如下：
 
 	@Override
 	public Object getAttribute(String name) {

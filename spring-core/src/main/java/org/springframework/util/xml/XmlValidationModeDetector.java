@@ -73,7 +73,7 @@ public class XmlValidationModeDetector {
 
 
 	/**
-	 * Indicates whether or not the current parse position is inside an XML comment.
+	 * 当前的分析位置是否在XML注释内.
 	 */
 	private boolean inComment;
 
@@ -92,25 +92,29 @@ public class XmlValidationModeDetector {
 		try {
 			boolean isDtdValidated = false;
 			String content;
+			//一行一行的读取项目了文件内容
 			while ((content = reader.readLine()) != null) {
 				content = consumeCommentTokens(content);
+				//当前行是注释或者没有Text
 				if (this.inComment || !StringUtils.hasText(content)) {
 					continue;
 				}
+				// 包含 DOCTYPE 为 DTD 模式
 				if (hasDoctype(content)) {
 					isDtdValidated = true;
 					break;
 				}
+				// 读取 < 开始符号，验证模式一定会在 < 符号之前
 				if (hasOpeningTag(content)) {
 					// End of meaningful data...
 					break;
 				}
 			}
+			// 为 true 返回 DTD，否则返回 XSD
 			return (isDtdValidated ? VALIDATION_DTD : VALIDATION_XSD);
 		}
 		catch (CharConversionException ex) {
-			// Choked on some character encoding...
-			// Leave the decision up to the caller.
+			// 出现异常，交给调用者去决定这个验证模式
 			return VALIDATION_AUTO;
 		}
 		finally {

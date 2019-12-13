@@ -167,10 +167,11 @@ public class ContextLoader {
 	private static final Properties defaultStrategies;
 
 	static {
-		// Load default strategy implementations from properties file.
-		// This is currently strictly internal and not meant to be customized
-		// by application developers.
-		try {
+    // 首先执行静态代码块：此代码块的功能是读取 Spring 的配置文件 ContextLoader.properties ，
+        // 而该配置文件的内容只有如下一行，
+        // org.springframework.web.context.WebApplicationContext=org.springframework.web.context.support.XmlWebApplicationContext
+        // 为 Spring 的字段defaultStrategies(java.util.Properties 类型) 赋如下的键值对 。
+    try {
 			ClassPathResource resource = new ClassPathResource(DEFAULT_STRATEGIES_PATH, ContextLoader.class);
 			defaultStrategies = PropertiesLoaderUtils.loadProperties(resource);
 		}
@@ -320,13 +321,16 @@ public class ContextLoader {
 				if (!cwac.isActive()) {
 					// The context has not yet been refreshed -> provide services such as
 					// setting the parent context, setting the application context id, etc
+					//第一次启动parent肯定是null的
 					if (cwac.getParent() == null) {
 						// The context instance was injected without an explicit parent ->
 						// determine parent for root web application context, if any.
+						// 如果web.xml中没有配置locatorFactorySelector、parentContextKey，则parent还是null
 						ApplicationContext parent = loadParentContext(servletContext);  //尝试获取parentContext。
 						cwac.setParent(parent);  //parent为null
 					}
-					//一些WebApplicationContext的设置如：id，servletContext，configLocation。
+					//一些WebApplicationContext的设置如：id，servletContext，configLocation（在web.xml中有配置）。
+					//把servletcontext和ServletConfig放到environment中
 					// 执行自定义的ApplicationContextInitializer
 					// 最后调用refresh方法，启动ioc容器。
 					configureAndRefreshWebApplicationContext(cwac, servletContext);
@@ -410,6 +414,7 @@ public class ContextLoader {
 			}
 		}
 		//使用ContextLoader.properties中配置的org.springframework.web.context.support.XmlWebApplicationContext
+        //defaultStrategies属性在静态代码块中初始化
 		else {
 			contextClassName = defaultStrategies.getProperty(WebApplicationContext.class.getName());
 			try {
@@ -425,8 +430,8 @@ public class ContextLoader {
 	protected void configureAndRefreshWebApplicationContext(ConfigurableWebApplicationContext wac, ServletContext sc) {
 		//设置WebApplicationContext的id
 		if (ObjectUtils.identityToString(wac).equals(wac.getId())) {
-			// The application context id is still set to its original default value
-			// -> assign a more useful id based on available information
+			//wac的id在初始化的时候被设置了，也是使用的objectUtils的算法，所以这里是相等的
+			//走这一步是替换初识的id
 			String idParam = sc.getInitParameter(CONTEXT_ID_PARAM);
 			if (idParam != null) {
 				wac.setId(idParam);
@@ -439,7 +444,7 @@ public class ContextLoader {
 		}
 		//将servletContext设置到WebApplicationContext中
 		wac.setServletContext(sc);
-//		设置applicationContext.xml配置的位置。容器启动时使用
+        //获取Spring配置文件的位置。容器启动时使用
 		String configLocationParam = sc.getInitParameter(CONFIG_LOCATION_PARAM);
 		if (configLocationParam != null) {
 			wac.setConfigLocation(configLocationParam);
@@ -451,11 +456,13 @@ public class ContextLoader {
 		//没有则实例化一个StandardServletEnvironment对象。
 		ConfigurableEnvironment env = wac.getEnvironment();
 		if (env instanceof ConfigurableWebEnvironment) {
-			((ConfigurableWebEnvironment) env).initPropertySources(sc, null);
+			//StandardServletEnvironment是ConfigurableWebEnvironment的子类
+			((ConfigurableWebEnvironment) env).initPropertySources(sc, null);//这一步一般没有什么重要的事情
 		}
-		//定制化上下文，执行自定义ApplicationContextInitializer。
+		//交由子类区覆盖实现，定制化上下文，执行自定义ApplicationContextInitializer。
 		customizeContext(sc, wac);
-		wac.refresh();         //启动ioc容器。
+		//spring项目的启动核心，启动ioc容器。
+		wac.refresh();
 	}
 
 	/**

@@ -22,114 +22,82 @@ import java.net.URI;
 import java.net.URL;
 
 /**
- * Interface for a resource descriptor that abstracts from the actual
- * type of underlying resource, such as a file or class path resource.
+ * 资源描述符的接口，它从基础资源的实际类型中抽象出来，例如文件或类路径资源。
+ * Spring 框架所有资源的抽象和访问接口，它继承{@link InputStreamSource}接口。
+ * 作为所有资源的统一抽象，Source 定义了一些通用的方法，由子类 AbstractResource 提供统一的默认实现。
  *
- * <p>An InputStream can be opened for every resource if it exists in
- * physical form, but a URL or File handle can just be returned for
- * certain resources. The actual behavior is implementation-specific.
  *
- * @author Juergen Hoeller
- * @since 28.12.2003
- * @see #getInputStream()
- * @see #getURL()
- * @see #getURI()
- * @see #getFile()
+ * Resource体系 Resource是对资源的抽象，根据资源的不同类型提供不同的具体实现：
  * @see WritableResource
  * @see ContextResource
- * @see FileSystemResource
- * @see ClassPathResource
- * @see UrlResource
- * @see ByteArrayResource
- * @see InputStreamResource
+ * @see FileSystemResource ：对 java.io.File 类型资源的封装，只要是跟 File 打交道的，基本上与 FileSystemResource 也可以打交道。支持文件和 URL 的形式，实现 WritableResource 接口，且从 Spring Framework 5.0 开始，FileSystemResource 使用NIO.2 API进行读/写交互
+ * @see ClassPathResource ：class path 类型资源的实现。使用给定的 ClassLoader 或者给定的 Class 来加载资源。
+ * @see UrlResource ：对 java.net.URL类型资源的封装。内部委派 URL 进行具体的资源操作。
+ * @see ByteArrayResource ： 对字节数组提供的数据的封装。如果通过 InputStream 形式访问该类型的资源，该实现会根据字节数组的数据构造一个相应的 ByteArrayInputStream。
+ * @see InputStreamResource ： 将给定的 InputStream 作为一种资源的 Resource 的实现类。
  * @see PathResource
+ *
+ * 有了资源就应该有资源加载，Spring 进行统一资源加载的接口是
+ * @see ResourceLoader
  */
 public interface Resource extends InputStreamSource {
 
 	/**
-	 * Return whether this resource actually exists in physical form.
-	 * <p>This method performs a definitive existence check, whereas the
-	 * existence of a {@code Resource} handle only guarantees a
-	 * valid descriptor handle.
+	 * 资源是否真实存在（物理形式）
 	 */
 	boolean exists();
 
 	/**
-	 * Return whether the contents of this resource can be read,
-	 * e.g. via {@link #getInputStream()} or {@link #getFile()}.
-	 * <p>Will be {@code true} for typical resource descriptors;
-	 * note that actual content reading may still fail when attempted.
-	 * However, a value of {@code false} is a definitive indication
-	 * that the resource content cannot be read.
-	 * @see #getInputStream()
+	 * 资源是否可读（通过{@link #getInputStream（）}或{@link #getFile（）}）：
+	 * 结果为true也有可能会读取失败，但是false一定是资源不可读的
 	 */
 	boolean isReadable();
 
 	/**
-	 * Return whether this resource represents a handle with an open
-	 * stream. If true, the InputStream cannot be read multiple times,
-	 * and must be read and closed to avoid resource leaks.
-	 * <p>Will be {@code false} for typical resource descriptors.
+	 *资源所代表的句柄是否被一个stream打开了
 	 */
 	boolean isOpen();
 
 	/**
-	 * Return a URL handle for this resource.
-	 * @throws IOException if the resource cannot be resolved as URL,
-	 * i.e. if the resource is not available as descriptor
+	 * 返回资源的URL的句柄
 	 */
 	URL getURL() throws IOException;
 
 	/**
-	 * Return a URI handle for this resource.
-	 * @throws IOException if the resource cannot be resolved as URI,
-	 * i.e. if the resource is not available as descriptor
+	 * 返回资源的URI 句柄
 	 */
 	URI getURI() throws IOException;
 
 	/**
-	 * Return a File handle for this resource.
-	 * @throws IOException if the resource cannot be resolved as absolute
-	 * file path, i.e. if the resource is not available in a file system
+	 * 返回资源的文件句柄
 	 */
 	File getFile() throws IOException;
 
 	/**
-	 * Determine the content length for this resource.
-	 * @throws IOException if the resource cannot be resolved
-	 * (in the file system or as some other known physical resource type)
+	 * 资源内容长度
 	 */
 	long contentLength() throws IOException;
 
 	/**
-	 * Determine the last-modified timestamp for this resource.
-	 * @throws IOException if the resource cannot be resolved
-	 * (in the file system or as some other known physical resource type)
+	 *资源最后修改时间
 	 */
 	long lastModified() throws IOException;
 
 	/**
-	 * Create a resource relative to this resource.
-	 * @param relativePath the relative path (relative to this resource)
-	 * @return the resource handle for the relative resource
-	 * @throws IOException if the relative resource cannot be determined
+	 * 根据资源的相对路径穿件新资源
+	 * @param relativePath 相对于此资源的相对路径
+	 * @return 相对资源的 资源句柄
+	 * @throws IOException 如果无法确定相对资源
 	 */
 	Resource createRelative(String relativePath) throws IOException;
 
 	/**
-	 * Determine a filename for this resource, i.e. typically the last
-	 * part of the path: for example, "myfile.txt".
-	 * <p>Returns {@code null} if this type of resource does not
-	 * have a filename.
+	 * 确定资源的文件名称
 	 */
 	String getFilename();
 
 	/**
-	 * Return a description for this resource,
-	 * to be used for error output when working with the resource.
-	 * <p>Implementations are also encouraged to return this value
-	 * from their {@code toString} method.
-	 * @see Object#toString()
+	 * 资源描述
 	 */
 	String getDescription();
 

@@ -19,8 +19,11 @@ package org.springframework.core.io;
 import org.springframework.util.ResourceUtils;
 
 /**
- * Strategy interface for loading resources (e.. class path or file system
- * resources). An {@link org.springframework.context.ApplicationContext}
+ * Spring 将资源的定义和资源的加载区分开了，Resource 定义了统一的资源，资源的加载则由 ResourceLoader 来统一定义。
+ *
+ * 加载资源的策略接口(例如classpath 或者文件系统资源等的).
+ *
+ * An {@link org.springframework.context.ApplicationContext}
  * is required to provide this functionality, plus extended
  * {@link org.springframework.core.io.support.ResourcePatternResolver} support.
  *
@@ -38,6 +41,7 @@ import org.springframework.util.ResourceUtils;
  * @see org.springframework.context.ApplicationContext
  * @see org.springframework.context.ResourceLoaderAware
  */
+//Spring 利用 ResourceLoader 来进行统一资源加载(对各种Resource的加载)
 //加载资源的策略接口，支持文件系统加载，classpath加载，相对路径加载。
 public interface ResourceLoader {
 
@@ -46,28 +50,27 @@ public interface ResourceLoader {
 
 
 	/**
-	 * Return a Resource handle for the specified resource.
-	 * The handle should always be a reusable resource descriptor,
-	 * allowing for multiple {@link Resource#getInputStream()} calls.
-	 * <p><ul>
-	 * <li>Must support fully qualified URLs, e.g. "file:C:/test.dat".
-	 * <li>Must support classpath pseudo-URLs, e.g. "classpath:test.dat".
-	 * <li>Should support relative file paths, e.g. "WEB-INF/test.dat".
+	 * 根据所提供资源的路径 location 返回 Resource 实例。
+     * 但是它不确保该 Resource 一定存在，需要调用 {@link Resource#exists}方法判断。该方法支持以下模式的资源加载：
+	 * URL位置资源,如: "file:C:/test.dat".
+	 * ClassPath位置资源，如："classpath:test.dat".
+	 * 相对路径资源，如: "WEB-INF/test.dat".
 	 * (This will be implementation-specific, typically provided by an
 	 * ApplicationContext implementation.)
-	 * </ul>
-	 * <p>Note that a Resource handle does not imply an existing resource;
-	 * you need to invoke {@link Resource#exists} to check for existence.
+	 *
+	 *
 	 * @param location the resource location
 	 * @return a corresponding Resource handle
 	 * @see #CLASSPATH_URL_PREFIX
 	 * @see org.springframework.core.io.Resource#exists
 	 * @see org.springframework.core.io.Resource#getInputStream
 	 */
+	//ResourceLoader 的 Resource getResource(String location) 每次只能根据 location 返回一个 Resource，
+	// 当需要加载多个资源时，我们除了多次调用 getResource() 外别无他法。
 	Resource getResource(String location);
 
 	/**
-	 * Expose the ClassLoader used by this ResourceLoader.
+	 * 返回ResourceLoader使用的ClassLoader；
 	 * <p>Clients which need to access the ClassLoader directly can do so
 	 * in a uniform manner with the ResourceLoader, rather than relying
 	 * on the thread context ClassLoader.

@@ -45,19 +45,27 @@ public class SimpleAliasRegistry implements AliasRegistry {
 
     @Override
     public void registerAlias(String name, String alias) {
+        //注册的前的去null判断
         Assert.hasText(name, "'name' must not be empty");
         Assert.hasText(alias, "'alias' must not be empty");
+
         if (alias.equals(name)) {
+            //如果beanName与alias相同的话,从aliasMap移除相同的alias
             this.aliasMap.remove(alias);
         } else {
+            //alias和beanName不同，不允许别名覆盖
             if (!allowAliasOverriding()) {
+                // 从缓存中获取name
                 String registeredName = this.aliasMap.get(alias);
+                //如果存在,就不要注册了,直接抛异常
                 if (registeredName != null && !registeredName.equals(name)) {
                     throw new IllegalStateException("Cannot register alias '" + alias + "' for name '" +
                             name + "': It is already registered for name '" + registeredName + "'.");
                 }
             }
+            // 当 A --> B 存在时，如果再次出现 A --> B --> C 则抛出异常
             checkForAliasCircle(name, alias);
+            // 注册 alias
             this.aliasMap.put(alias, name);
         }
     }

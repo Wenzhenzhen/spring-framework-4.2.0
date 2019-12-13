@@ -53,6 +53,7 @@ public final class ParserContext {
 		this.delegate = delegate;
 	}
 
+	//BeanDefinition如果此时为顶级父类,默认为null
 	public ParserContext(XmlReaderContext readerContext, BeanDefinitionParserDelegate delegate,
 			BeanDefinition containingBeanDefinition) {
 

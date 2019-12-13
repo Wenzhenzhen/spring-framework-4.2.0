@@ -34,15 +34,15 @@ import org.springframework.beans.factory.BeanDefinitionStoreException;
  * @since 18.12.2003
  * @see XmlBeanDefinitionReader#setDocumentReaderClass
  */
-//解析包含spring BeanDefinition的xml文档
+
+// 注册 BeanDefinition 的方法 registerBeanDefinitions() 是在接口 BeanDefinitionDocumentReader 中定义，如下：
 public interface BeanDefinitionDocumentReader {
 
 	/**
-	 * Read bean definitions from the given DOM document and
-	 * register them with the registry in the given reader context.
-	 * @param doc the DOM document
-	 * @param readerContext the current context of the reader
-	 * (includes the target registry and the resource being parsed)
+	 * 从给定的 Document 对象中解析定义的 BeanDefinition 并将他们注册到注册表中。
+	 * @param doc 待解析的 Document 对象
+	 * @param readerContext 解析器当前上下文(（包括目标注册表和正在解析的资源）)
+
 	 * @throws BeanDefinitionStoreException in case of parsing errors
 	 */
 	void registerBeanDefinitions(Document doc, XmlReaderContext readerContext)

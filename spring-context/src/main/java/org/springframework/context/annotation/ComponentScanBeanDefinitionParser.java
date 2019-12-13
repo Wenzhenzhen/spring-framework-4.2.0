@@ -72,21 +72,33 @@ public class ComponentScanBeanDefinitionParser implements BeanDefinitionParser {
 
 	@Override
 	public BeanDefinition parse(Element element, ParserContext parserContext) {
+		//获取包扫描路径，对应配置文件中的base-package="com.viewscenes.netsupervisor"
 		String basePackage = element.getAttribute(BASE_PACKAGE_ATTRIBUTE);
 		//解析basePackage中的占位符
 		basePackage = parserContext.getReaderContext().getEnvironment().resolvePlaceholders(basePackage);
+        //这里可能有多个包路径，分割成数组
 		String[] basePackages = StringUtils.tokenizeToStringArray(basePackage,
 				ConfigurableApplicationContext.CONFIG_LOCATION_DELIMITERS);
 
+
+        /**
+         * configureScanner 配置扫描器。
+         * scanner.doScan 扫描执行
+         * registerComponents 这里重点是对registerComponents的支持
+         */
 		// Actually scan for bean definitions and register them. 解析component-scan上的属性构造ClassPathBeanDefinitionScanner对象
 		ClassPathBeanDefinitionScanner scanner = configureScanner(parserContext, element);
+		//doScan 扫描分为三个步骤
 		Set<BeanDefinitionHolder> beanDefinitions = scanner.doScan(basePackages);
+        //对annotation-config的支持
 		registerComponents(parserContext.getReaderContext(), beanDefinitions, element);
 
 		return null;
 	}
 
 	protected ClassPathBeanDefinitionScanner configureScanner(ParserContext parserContext, Element element) {
+	    //这里面重点就是注册了默认的过滤器(Component,Named)。use-default-filters，默认值是true，
+        // 如果配置文件配置了此属性的值为false，有些注解就加不进来，到下一步扫描的时候就注册不了Bean。
 		boolean useDefaultFilters = true;
 		if (element.hasAttribute(USE_DEFAULT_FILTERS_ATTRIBUTE)) {   //use-default-filters属性
 			useDefaultFilters = Boolean.valueOf(element.getAttribute(USE_DEFAULT_FILTERS_ATTRIBUTE));
@@ -141,6 +153,7 @@ public class ComponentScanBeanDefinitionParser implements BeanDefinitionParser {
 		if (element.hasAttribute(ANNOTATION_CONFIG_ATTRIBUTE)) {
 			annotationConfig = Boolean.valueOf(element.getAttribute(ANNOTATION_CONFIG_ATTRIBUTE));
 		}
+        //判断annotation-config属性的值
 		if (annotationConfig) {
 			Set<BeanDefinitionHolder> processorDefinitions =
 					AnnotationConfigUtils.registerAnnotationConfigProcessors(readerContext.getRegistry(), source);

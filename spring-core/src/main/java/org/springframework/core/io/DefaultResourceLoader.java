@@ -24,7 +24,7 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Default implementation of the {@link ResourceLoader} interface.
+ * {@link ResourceLoader}接口的默认实现.核心方法是getResource（）。
  * Used by {@link ResourceEditor}, and serves as base class for
  * {@link org.springframework.context.support.AbstractApplicationContext}.
  * Can also be used standalone.
@@ -44,7 +44,7 @@ public class DefaultResourceLoader implements ResourceLoader {
 
 
 	/**
-	 * Create a new DefaultResourceLoader.
+	 * 构造方法，使用默认的ClassLoader；
 	 * <p>ClassLoader access will happen using the thread context class loader
 	 * at the time of this ResourceLoader's initialization.
 	 * @see java.lang.Thread#getContextClassLoader()
@@ -84,24 +84,31 @@ public class DefaultResourceLoader implements ResourceLoader {
 		return (this.classLoader != null ? this.classLoader : ClassUtils.getDefaultClassLoader());
 	}
 
-
+	/**
+	 * 核心方法，根据location返回相应的Resource，封装资源加载策略（之类中未提供覆盖方法）
+	 *
+	 *
+	 * */
 	@Override
 	public Resource getResource(String location) {
 		Assert.notNull(location, "Location must not be null");
+
+		//若location以"/"开头，则构造ClassPathContextResource类型资源并返回
 		if (location.startsWith("/")) {
 			return getResourceByPath(location);
 		}
+		//若以"classpath:"开头，则构造ClassPathResource类型资源并返回，在构造该资源时，通过 getClassLoader()获取当前的 ClassLoader。
 		else if (location.startsWith(CLASSPATH_URL_PREFIX)) {
 			return new ClassPathResource(location.substring(CLASSPATH_URL_PREFIX.length()), getClassLoader());
 		}
 		else {
 			try {
-				// Try to parse the location as a URL...
+				//尝试将location解析为URL，通过URL定位资源，若没有抛出异常则构造UrlResource
 				URL url = new URL(location);
 				return new UrlResource(url);
 			}
 			catch (MalformedURLException ex) {
-				// No URL -> resolve as resource path.
+				// 若在加载过程中抛出 MalformedURLException 异常，则委派 getResourceByPath() 实现资源定位加载。
 				return getResourceByPath(location);
 			}
 		}
@@ -117,6 +124,9 @@ public class DefaultResourceLoader implements ResourceLoader {
 	 * @see ClassPathResource
 	 * @see org.springframework.context.support.FileSystemXmlApplicationContext#getResourceByPath
 	 * @see org.springframework.web.context.support.XmlWebApplicationContext#getResourceByPath
+	 *
+	 * 方法处理不太恰当，可以使用子类FileSystemResourceLoader 中的覆盖方法
+	 * {@link FileSystemResourceLoader#getResourceByPath(String)}
 	 */
 	protected Resource getResourceByPath(String path) {
 		return new ClassPathContextResource(path, getClassLoader());

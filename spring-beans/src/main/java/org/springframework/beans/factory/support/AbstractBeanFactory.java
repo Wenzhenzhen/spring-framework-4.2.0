@@ -118,7 +118,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
     private final List<StringValueResolver> embeddedValueResolvers = new LinkedList<StringValueResolver>();
 
     /**
-     * BeanPostProcessors to apply in createBean
+     * 一个private的list，用于存放BeanPostProcessor实例在createBean的时候使用
      */
     private final List<BeanPostProcessor> beanPostProcessors = new ArrayList<BeanPostProcessor>();
 
@@ -776,6 +776,11 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
         return result;
     }
 
+    //BeanPostProcessor注册的入口
+    // 该方法是由 AbstractBeanFactory 的父类 ConfigurableBeanFactory 定义，
+    // 它的核心意思就是将指定 BeanPostProcessor 注册到该 BeanFactory 创建的 bean 中，
+    // 同时它是按照插入的顺序进行注册的，完全忽略 Ordered 接口所表达任何排序语义
+    // （在 BeanPostProcessor 中我们提供一个 Ordered 顺序，这个后面讲解）。
     @Override
     public void addBeanPostProcessor(BeanPostProcessor beanPostProcessor) {
         Assert.notNull(beanPostProcessor, "BeanPostProcessor must not be null");

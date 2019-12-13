@@ -29,22 +29,16 @@ import org.springframework.util.Assert;
 import org.springframework.util.ResourceUtils;
 
 /**
- * Convenience base class for {@link Resource} implementations,
- * pre-implementing typical behavior.
- *
- * <p>The "exists" method will check whether a File or InputStream can
- * be opened; "isOpen" will always return false; "getURL" and "getFile"
- * throw an exception; and "toString" will return the description.
- *
+ * AbstractResource 为 Resource 接口的默认实现，它实现了 Resource 接口的大部分的公共实现；
+ * 如果我们想要实现自定义的 Resource，不要实现 Resource 接口，而应该继承 AbstractResource 抽象类，
+ * 然后根据当前的具体资源特性覆盖相应的方法即可。
  * @author Juergen Hoeller
  * @since 28.12.2003
  */
 public abstract class AbstractResource implements Resource {
 
 	/**
-	 * This implementation checks whether a File can be opened,
-	 * falling back to whether an InputStream can be opened.
-	 * This will cover both directories and content resources.
+	 * 判断文件是否存在，若判断过程产生异常（因为会调用SecurityManager来判断），就关闭对应的流
 	 */
 	@Override
 	public boolean exists() {
@@ -66,7 +60,7 @@ public abstract class AbstractResource implements Resource {
 	}
 
 	/**
-	 * This implementation always returns {@code true}.
+	 * 直接返回true，表示可读
 	 */
 	@Override
 	public boolean isReadable() {
@@ -74,7 +68,7 @@ public abstract class AbstractResource implements Resource {
 	}
 
 	/**
-	 * This implementation always returns {@code false}.
+	 * 直接返回 false，表示未被打开
 	 */
 	@Override
 	public boolean isOpen() {
@@ -82,8 +76,7 @@ public abstract class AbstractResource implements Resource {
 	}
 
 	/**
-	 * This implementation throws a FileNotFoundException, assuming
-	 * that the resource cannot be resolved to a URL.
+	 * 抛出 FileNotFoundException 异常，交给子类实现
 	 */
 	@Override
 	public URL getURL() throws IOException {
@@ -91,8 +84,7 @@ public abstract class AbstractResource implements Resource {
 	}
 
 	/**
-	 * This implementation builds a URI based on the URL returned
-	 * by {@link #getURL()}.
+	 * 基于 getURL() 返回的 URL 构建 URI
 	 */
 	@Override
 	public URI getURI() throws IOException {
@@ -106,8 +98,7 @@ public abstract class AbstractResource implements Resource {
 	}
 
 	/**
-	 * This implementation throws a FileNotFoundException, assuming
-	 * that the resource cannot be resolved to an absolute file path.
+	 * 抛出 FileNotFoundException 异常，交给子类实现
 	 */
 	@Override
 	public File getFile() throws IOException {
@@ -115,9 +106,7 @@ public abstract class AbstractResource implements Resource {
 	}
 
 	/**
-	 * This implementation reads the entire InputStream to calculate the
-	 * content length. Subclasses will almost always be able to provide
-	 * a more optimal version of this, e.g. checking a File length.
+	 * 读取整个输入流来计算资源内容长度
 	 * @see #getInputStream()
 	 * @throws IllegalStateException if {@link #getInputStream()} returns null.
 	 */
@@ -144,8 +133,7 @@ public abstract class AbstractResource implements Resource {
 	}
 
 	/**
-	 * This implementation checks the timestamp of the underlying File,
-	 * if available.
+	 * 此实现检查基础文件的时间戳（如果有）。
 	 * @see #getFileForLastModifiedCheck()
 	 */
 	@Override
@@ -159,11 +147,7 @@ public abstract class AbstractResource implements Resource {
 	}
 
 	/**
-	 * Determine the File to use for timestamp checking.
-	 * <p>The default implementation delegates to {@link #getFile()}.
-	 * @return the File to use for timestamp checking (never {@code null})
-	 * @throws IOException if the resource cannot be resolved as absolute
-	 * file path, i.e. if the resource is not available in a file system
+	 * 确定用于时间戳检查的文件。
 	 */
 	protected File getFileForLastModifiedCheck() throws IOException {
 		return getFile();

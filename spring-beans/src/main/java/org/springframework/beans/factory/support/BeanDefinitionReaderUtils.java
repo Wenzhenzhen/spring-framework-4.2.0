@@ -60,11 +60,15 @@ public class BeanDefinitionReaderUtils {
 		bd.setParentName(parentName);
 		if (className != null) {
 			if (classLoader != null) {
-				bd.setBeanClass(ClassUtils.forName(className, classLoader));       //设置Bean class
+				//设置Bean class。
+				//如果指定了classLoader则加载给定类名称的class对象
+				bd.setBeanClass(ClassUtils.forName(className, classLoader));
 			}
 			else {
-				bd.setBeanClassName(className);                                               //设置Bean className。
-			}                                                                                                     //beanClass和beanClassName都是设置的GenericBeanDefinition的beanClass属性。
+				//设置Bean className。
+				bd.setBeanClassName(className);
+			}
+			//beanClass和beanClassName都是设置的GenericBeanDefinition的beanClass属性。
 		}
 		return bd;
 	}

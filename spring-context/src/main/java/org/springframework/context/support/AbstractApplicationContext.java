@@ -707,7 +707,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
     /**
      * Modify the application context's internal bean factory after its standard
      * initialization. All bean definitions will have been loaded, but no beans
-     * will have been instantiated yet. This allows for registering special
+     * will have been instantiated yet. Tshis allows for registering special
      * BeanPostProcessors etc in certain ApplicationContext implementations.
      *
      * @param beanFactory the bean factory used by the application context
@@ -725,9 +725,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
     }
 
     /**
-     * Instantiate and invoke all registered BeanPostProcessor beans,
-     * respecting explicit order if given.
-     * <p>Must be called before any instantiation of application beans.
+     * 实例化并调用已注入的BeanPostProcessor
+     * 必须在bean实例化之前调用
      */
     protected void registerBeanPostProcessors(ConfigurableListableBeanFactory beanFactory) {
         PostProcessorRegistrationDelegate.registerBeanPostProcessors(beanFactory, this);

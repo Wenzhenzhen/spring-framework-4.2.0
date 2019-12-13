@@ -47,6 +47,8 @@ import org.springframework.util.StringUtils;
  * @author Dave Syer
  * @since 2.0
  */
+//自定义标签的解析器通常继承此方法并覆盖需要的方法
+
 public abstract class AbstractBeanDefinitionParser implements BeanDefinitionParser {
 
 	/** Constant for the "id" attribute */
@@ -56,11 +58,17 @@ public abstract class AbstractBeanDefinitionParser implements BeanDefinitionPars
 	public static final String NAME_ATTRIBUTE = "name";
 
 
+	/**
+	 * @see AbstractSingleBeanDefinitionParser#parseInternal(Element, ParserContext)
+	 */
 	@Override
 	public final BeanDefinition parse(Element element, ParserContext parserContext) {
+		//获取一个beanDefinition实例
+		//真正解析自定义标签的方法在parseInternal()中
 		AbstractBeanDefinition definition = parseInternal(element, parserContext);
 		if (definition != null && !parserContext.isNested()) {
 			try {
+				//解析id属性
 				String id = resolveId(element, definition, parserContext);
 				if (!StringUtils.hasText(id)) {
 					parserContext.getReaderContext().error(
@@ -69,13 +77,17 @@ public abstract class AbstractBeanDefinitionParser implements BeanDefinitionPars
 				}
 				String[] aliases = null;
 				if (shouldParseNameAsAliases()) {
+					//获取name属性
 					String name = element.getAttribute(NAME_ATTRIBUTE);
 					if (StringUtils.hasLength(name)) {
 						aliases = StringUtils.trimArrayElements(StringUtils.commaDelimitedListToStringArray(name));
 					}
 				}
+				//将AbstractBeanDefinition转化为BeanDefinitionHolder实例
 				BeanDefinitionHolder holder = new BeanDefinitionHolder(definition, id, aliases);
+				//注册
 				registerBeanDefinition(holder, parserContext.getRegistry());
+				//通知对应的事件监听器
 				if (shouldFireEvents()) {
 					BeanComponentDefinition componentDefinition = new BeanComponentDefinition(holder);
 					postProcessComponentDefinition(componentDefinition);

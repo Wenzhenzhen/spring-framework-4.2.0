@@ -69,7 +69,7 @@ public class PluggableSchemaResolver implements EntityResolver {
 
 	private final String schemaMappingsLocation;
 
-	/** Stores the mapping of schema URL -> local schema path */
+	/** systemId（即schema URL ） 与其在本地位置的对照关系 */
 	private volatile Map<String, String> schemaMappings;
 
 
@@ -100,6 +100,7 @@ public class PluggableSchemaResolver implements EntityResolver {
 		this.schemaMappingsLocation = schemaMappingsLocation;
 	}
 
+
 	@Override
 	public InputSource resolveEntity(String publicId, String systemId) throws IOException {
 		if (logger.isTraceEnabled()) {
@@ -108,10 +109,13 @@ public class PluggableSchemaResolver implements EntityResolver {
 		}
 
 		if (systemId != null) {
+			//1. getSchemaMappings()获取一个映射表(systemId 与其在本地的对照关系)
+			//2. 然后根据传入的 systemId 获取该 systemId 在本地的路径 resourceLocation
 			String resourceLocation = getSchemaMappings().get(systemId);
 			if (resourceLocation != null) {
 				Resource resource = new ClassPathResource(resourceLocation, this.classLoader);
 				try {
+					//3. 最后根据 resourceLocation 构造 InputSource 对象。
 					InputSource source = new InputSource(resource.getInputStream());
 					source.setPublicId(publicId);
 					source.setSystemId(systemId);
@@ -131,7 +135,7 @@ public class PluggableSchemaResolver implements EntityResolver {
 	}
 
 	/**
-	 * Load the specified schema mappings lazily.
+	 * 延迟加载指定的schema映射
 	 */
 	private Map<String, String> getSchemaMappings() {
 		if (this.schemaMappings == null) {
@@ -141,6 +145,7 @@ public class PluggableSchemaResolver implements EntityResolver {
 						logger.debug("Loading schema mappings from [" + this.schemaMappingsLocation + "]");
 					}
 					try {
+					    //默认的schema映射地址是："META-INF/spring.schemas"，加载映射文件
 						Properties mappings =
 								PropertiesLoaderUtils.loadAllProperties(this.schemaMappingsLocation, this.classLoader);
 						if (logger.isDebugEnabled()) {

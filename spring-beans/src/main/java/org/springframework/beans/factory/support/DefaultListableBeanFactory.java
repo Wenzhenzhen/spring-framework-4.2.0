@@ -109,6 +109,9 @@ import org.springframework.util.StringUtils;
  * @see org.springframework.beans.factory.xml.XmlBeanDefinitionReader
  * @since 16 April 2001
  */
+//DefaultListableBeanFactory 为最终默认实现，
+// 它实现了所有接口:ListableBeanFactory、HierarchicalBeanFactory 和 AutowireCapableBeanFactory
+
 @SuppressWarnings("serial")
 public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFactory
         implements ConfigurableListableBeanFactory, BeanDefinitionRegistry, Serializable {
@@ -170,7 +173,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
     private final Map<Class<?>, Object> resolvableDependencies = new HashMap<Class<?>, Object>(16);
 
     /**
-     * Map of bean definition objects, keyed by bean name
+     * bean 定义 对象的 Map 集合，通过 bean 名称 键入；
      */
     private final Map<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap<String, BeanDefinition>(64);
 
@@ -185,12 +188,12 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
     private final Map<Class<?>, String[]> singletonBeanNamesByType = new ConcurrentHashMap<Class<?>, String[]>(64);
 
     /**
-     * List of bean definition names, in registration order
+     * bean 定义 名称的 list 集合，按注册顺序
      */
     private final List<String> beanDefinitionNames = new ArrayList<String>(64);
 
     /**
-     * List of names of manually registered singletons, in registration order
+     * 手动注册的单例bean的名称的 list 集合；
      */
     private final Set<String> manualSingletonNames = new LinkedHashSet<String>(16);
 
@@ -831,11 +834,14 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
     public void registerBeanDefinition(String beanName, BeanDefinition beanDefinition)
             throws BeanDefinitionStoreException {
 
+        //简单的非null判断
         Assert.hasText(beanName, "Bean name must not be empty");
         Assert.notNull(beanDefinition, "BeanDefinition must not be null");
 
         if (beanDefinition instanceof AbstractBeanDefinition) {
             try {
+                //在注册前进行统一检验
+                //1. 此处的检验是针对AbstractBeanDefinition的属性methodOverrides的检验
                 ((AbstractBeanDefinition) beanDefinition).validate();
             } catch (BeanDefinitionValidationException ex) {
                 throw new BeanDefinitionStoreException(beanDefinition.getResourceDescription(), beanName,
@@ -845,39 +851,54 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
         BeanDefinition oldBeanDefinition;
 
+        //2. 从缓存中通过beanName去拿beanDefinition
         oldBeanDefinition = this.beanDefinitionMap.get(beanName);
+        //3. beanDefinition存在的情况下
         if (oldBeanDefinition != null) {
+            //不允许出现重复的,抛异常
             if (!isAllowBeanDefinitionOverriding()) {
                 throw new BeanDefinitionStoreException(beanDefinition.getResourceDescription(), beanName,
                         "Cannot register bean definition [" + beanDefinition + "] for bean '" + beanName +
                                 "': There is already [" + oldBeanDefinition + "] bound.");
-            } else if (oldBeanDefinition.getRole() < beanDefinition.getRole()) {
+            }
+            // 覆盖 beanDefinition 大于 被覆盖的 beanDefinition 的 ROLE ，打印 info 日志
+            else if (oldBeanDefinition.getRole() < beanDefinition.getRole()) {
                 // e.g. was ROLE_APPLICATION, now overriding with ROLE_SUPPORT or ROLE_INFRASTRUCTURE
                 if (this.logger.isWarnEnabled()) {
                     this.logger.warn("Overriding user-defined bean definition for bean '" + beanName +
                             "' with a framework-generated bean definition: replacing [" +
                             oldBeanDefinition + "] with [" + beanDefinition + "]");
                 }
-            } else if (!beanDefinition.equals(oldBeanDefinition)) {
+            }
+            // 覆盖 beanDefinition 与 被覆盖的 beanDefinition 不相同，打印 debug 日志
+            else if (!beanDefinition.equals(oldBeanDefinition)) {
                 if (this.logger.isInfoEnabled()) {
                     this.logger.info("Overriding bean definition for bean '" + beanName +
                             "' with a different definition: replacing [" + oldBeanDefinition +
                             "] with [" + beanDefinition + "]");
                 }
-            } else {
+            }
+            //其他的,都打印debug日志
+            else {
                 if (this.logger.isDebugEnabled()) {
                     this.logger.debug("Overriding bean definition for bean '" + beanName +
                             "' with an equivalent definition: replacing [" + oldBeanDefinition +
                             "] with [" + beanDefinition + "]");
                 }
             }
-        } else {
+        }
+        //4. 为null的情况下
+        else {
+            //将beanName保存到beanDefinitionNames中
             this.beanDefinitionNames.add(beanName);
+            //从manualSingletonNames移除 beanName
             this.manualSingletonNames.remove(beanName);
             this.frozenBeanDefinitionNames = null;
         }
+        //将beanDefinition保存到beanDefinitionMap中
         this.beanDefinitionMap.put(beanName, beanDefinition);
-
+        //如果从缓存中获取到的beanDefinition不为null or 单例的,
+        //重置所有beanName对应的缓存
         if (oldBeanDefinition != null || containsSingleton(beanName)) {
             resetBeanDefinition(beanName);
         }

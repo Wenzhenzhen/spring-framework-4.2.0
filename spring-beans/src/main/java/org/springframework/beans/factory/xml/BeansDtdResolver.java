@@ -27,8 +27,9 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
 /**
- * EntityResolver implementation for the Spring beans DTD,
- * to load the DTD from the Spring class path (or JAR file).
+ * EntityResolver 接口的实现，用来从 classpath 或者 jar 文件加载 dtd;
+ * spring bean dtd 解析器。
+ *
  *
  * <p>Fetches "spring-beans-2.0.dtd" from the class path resource
  * "/org/springframework/beans/factory/xml/spring-beans-2.0.dtd",
@@ -51,6 +52,8 @@ public class BeansDtdResolver implements EntityResolver {
 	private static final Log logger = LogFactory.getLog(BeansDtdResolver.class);
 
 
+	//只是对 systemId 进行了简单的校验（从最后一个 / 开始，内容中是否包含 spring-beans），
+	// 然后构造一个 InputSource 并设置 publicId、systemId，然后返回。
 	@Override
 	public InputSource resolveEntity(String publicId, String systemId) throws IOException {
 		if (logger.isTraceEnabled()) {

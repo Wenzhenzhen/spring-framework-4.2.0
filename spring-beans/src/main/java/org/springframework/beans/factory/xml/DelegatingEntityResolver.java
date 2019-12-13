@@ -25,9 +25,9 @@ import org.xml.sax.SAXException;
 import org.springframework.util.Assert;
 
 /**
- * {@link EntityResolver} implementation that delegates to a {@link BeansDtdResolver}
- * and a {@link PluggableSchemaResolver} for DTDs and XML schemas, respectively.
  *
+ * {@link EntityResolver} 的实现，分别代理了 dtd 的 {@link BeansDtdResolver} 和 xml schemas 的 {@link PluggableSchemaResolver};
+
  * @author Rob Harrop
  * @author Juergen Hoeller
  * @author Rick Evans
@@ -37,10 +37,10 @@ import org.springframework.util.Assert;
  */
 public class DelegatingEntityResolver implements EntityResolver {
 
-	/** Suffix for DTD files */
+	/** DTD文件后缀*/
 	public static final String DTD_SUFFIX = ".dtd";
 
-	/** Suffix for schema definition files */
+	/** schema文件后缀 */
 	public static final String XSD_SUFFIX = ".xsd";
 
 
@@ -75,9 +75,23 @@ public class DelegatingEntityResolver implements EntityResolver {
 		this.schemaResolver = schemaResolver;
 	}
 
+	  // 重写EntityResolver的方法
+	  // 两个参数
+	  // publicId：被引用的外部实体的公共标识符，如果没有提供，则返回null
+	  // systemId：被引用的外部实体的系统标识符 这两个参数的实际内容和具体的验证模式有关系。如下：
+	  // XSD 验证模式
+	  // publicId：null
+	  // systemId：http://www.springframework.org/schema/beans/spring-beans.xsd
 
-	@Override
-	public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
+	  // DTD 验证模式
+	  // publicId：-//SPRING//DTD BEAN 2.0//EN
+	  // systemId：http://www.springframework.org/dtd/spring-beans.dtd
+	  @Override
+	  public InputSource resolveEntity(String publicId, String systemId)
+     	 throws SAXException, IOException {
+
+		  //不同的验证模式使用不同的解析器解析，如果是 DTD 验证模式则使用 BeansDtdResolver 来进行解析，
+		  // 如果是 XSD 则使用 PluggableSchemaResolver 来进行解析。
 		if (systemId != null) {
 			if (systemId.endsWith(DTD_SUFFIX)) {
 				return this.dtdResolver.resolveEntity(publicId, systemId);

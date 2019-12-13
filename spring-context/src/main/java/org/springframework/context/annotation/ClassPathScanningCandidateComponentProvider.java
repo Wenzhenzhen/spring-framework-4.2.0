@@ -112,6 +112,8 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 	 * @see #registerDefaultFilters()
 	 */
 	public ClassPathScanningCandidateComponentProvider(boolean useDefaultFilters, Environment environment) {
+		//这个就是配置的use-default-filters，如果配置了false。那么下面的
+		// Component、ManagedBean、Named注解都不会被扫描到
 		if (useDefaultFilters) {
 			registerDefaultFilters();
 		}
