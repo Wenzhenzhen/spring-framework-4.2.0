@@ -57,7 +57,8 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 
 	@Override
 	public Object instantiate(RootBeanDefinition bd, String beanName, BeanFactory owner) {
-		// Don't override the class with CGLIB if no overrides. 如果MethodOverride不为空，则使用cglib
+		// Don't override the class with CGLIB if no overrides.
+		// 如果MethodOverride不为空，则使用cglib
 		if (bd.getMethodOverrides().isEmpty()) {
 			Constructor<?> constructorToUse;
 			synchronized (bd.constructorArgumentLock) {
@@ -108,10 +109,12 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 	@Override
 	public Object instantiate(RootBeanDefinition bd, String beanName, BeanFactory owner,
 			final Constructor<?> ctor, Object... args) {
-
+		// 没有覆盖
+		// 直接使用反射实例化即可
 		if (bd.getMethodOverrides().isEmpty()) {
 			if (System.getSecurityManager() != null) {
 				// use own privileged to change accessibility (when security is on)
+				// 更改可访问性
 				AccessController.doPrivileged(new PrivilegedAction<Object>() {
 					@Override
 					public Object run() {
@@ -120,9 +123,15 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 					}
 				});
 			}
+			// 通过BeanUtils直接使用构造器对象实例化bean
+			// 如果该 bean 没有配置 lookup-method、replaced-method 标签或者 @Lookup 注解，
+			// 则直接通过反射的方式实例化 bean 即可
 			return BeanUtils.instantiateClass(ctor, args);
 		}
 		else {
+			// 生成CGLIB创建的子类对象
+			// 如果存在需要覆盖的方法或者动态替换的方法则需要使用 CGLIB 进行动态代理，
+			// 因为可以在创建代理的同时将动态方法织入类中。
 			return instantiateWithMethodInjection(bd, beanName, owner, ctor, args);
 		}
 	}
@@ -139,6 +148,7 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 		throw new UnsupportedOperationException("Method Injection not supported in SimpleInstantiationStrategy");
 	}
 
+	//创建 bean 实例：利用 Java 反射执行工厂方法并返回创建好的实例
 	@Override
 	public Object instantiate(RootBeanDefinition bd, String beanName, BeanFactory owner,
 			Object factoryBean, final Method factoryMethod, Object... args) {
@@ -154,15 +164,19 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 				});
 			}
 			else {
+				//暴力访问
 				ReflectionUtils.makeAccessible(factoryMethod);
 			}
-
+			//记录先前调用的方法
 			Method priorInvokedFactoryMethod = currentlyInvokedFactoryMethod.get();
 			try {
+				//设置currentlyInvokedFactoryMethod为当前传入的factoryMethod
 				currentlyInvokedFactoryMethod.set(factoryMethod);
+				// 执行工厂方法，并返回实例
 				return factoryMethod.invoke(factoryBean, args);
 			}
 			finally {
+				//如果先前调用的方法不为null，重新将其赋给currentlyInvokedFactoryMethod
 				if (priorInvokedFactoryMethod != null) {
 					currentlyInvokedFactoryMethod.set(priorInvokedFactoryMethod);
 				}

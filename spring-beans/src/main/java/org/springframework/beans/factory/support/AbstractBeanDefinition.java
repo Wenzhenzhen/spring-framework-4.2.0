@@ -854,6 +854,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 
     /**
      * Return whether this bean definition is 'synthetic', that is, not defined by the application itself.
+     * 返回此bean是否是 “人为的”，即不是由程序定义的
      */
     public boolean isSynthetic() {
         return this.synthetic;
@@ -954,6 +955,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
     public void prepareMethodOverrides() throws BeanDefinitionValidationException {
         // Check that lookup methods exists.
         MethodOverrides methodOverrides = getMethodOverrides();
+        // 如果存在 methodOverrides 则获取所有的 override method ，然后通过迭代的方法一次调用 prepareMethodOverride()
         if (!methodOverrides.isEmpty()) {
             for (MethodOverride mo : methodOverrides.getOverrides()) {
                 prepareMethodOverride(mo);
@@ -970,6 +972,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
      * @throws BeanDefinitionValidationException in case of validation failure
      */
     protected void prepareMethodOverride(MethodOverride mo) throws BeanDefinitionValidationException {
+        //根据方法名称从 class 中获取该方法名的个数，如果为 0 则抛出异常，如果 为 1 则设置该重载方法没有被重载。
         int count = ClassUtils.getMethodCountForName(getBeanClass(), mo.getMethodName());
         if (count == 0) {
             throw new BeanDefinitionValidationException(
@@ -977,7 +980,8 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
                             "' on class [" + getBeanClassName() + "]");
         } else if (count == 1) {
             // Mark override as not overloaded, to avoid the overhead of arg type checking.
-            //标记override为不覆盖,避免参数类型检查的开销。
+            //标记override为未重载,避免参数类型检查的开销。
+            //若一个类中存在多个重载方法，则在方法调用的时候还需要根据参数类型来判断到底重载的是哪个方法。
             mo.setOverloaded(false);
         }
     }

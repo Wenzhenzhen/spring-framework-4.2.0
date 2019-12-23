@@ -155,7 +155,8 @@ public class SimpleAliasRegistry implements AliasRegistry {
 
     /**
      * Determine the raw name, resolving aliases to canonical names.
-     *
+     * 确定原始名称，将别名解析为规范名称
+     * aliasMap中是别名到beanName的映射
      * @param name the user-specified name
      * @return the transformed name
      */

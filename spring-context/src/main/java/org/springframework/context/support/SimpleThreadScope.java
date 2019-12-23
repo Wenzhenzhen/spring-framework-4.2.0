@@ -66,10 +66,14 @@ public class SimpleThreadScope implements Scope {
 
 	@Override
 	public Object get(String name, ObjectFactory<?> objectFactory) {
+		//获取scope
 		Map<String, Object> scope = this.threadScope.get();
+		//获取bean实例
 		Object object = scope.get(name);
 		if (object == null) {
+			//如果为null的话调用ObjectFactory的getobject方法获取实例
 			object = objectFactory.getObject();
+			//保存操作
 			scope.put(name, object);
 		}
 		return object;

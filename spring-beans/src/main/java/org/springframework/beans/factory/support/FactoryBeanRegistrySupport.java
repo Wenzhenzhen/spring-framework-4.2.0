@@ -92,11 +92,13 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
 	 * @see org.springframework.beans.factory.FactoryBean#getObject()
 	 */
 	protected Object getObjectFromFactoryBean(FactoryBean<?> factory, String beanName, boolean shouldPostProcess) {
+		// 为单例模式且缓存中存在
 		if (factory.isSingleton() && containsSingleton(beanName)) {
 			synchronized (getSingletonMutex()) {
+				// 从缓存中获取指定的 factoryBean
 				Object object = this.factoryBeanObjectCache.get(beanName);
 				if (object == null) {
-					//调用FactoryBean的getObject方法。
+					// 为空，则从 FactoryBean 中获取对象,调用FactoryBean的getObject方法。
 					object = doGetObjectFromFactoryBean(factory, beanName);
 					// Only post-process and store if not put there already during getObject() call above
 					// (e.g. because of circular reference processing triggered by custom getBean calls)
@@ -105,8 +107,12 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
 						object = alreadyThere;
 					}
 					else {
+						// 需要后续处理
 						if (object != null && shouldPostProcess) {
 							try {
+								//对object进行后置处理,如果在FactoryBean找不到该object抛如下异常
+								// 对从 FactoryBean 获取的对象进行后处理
+								// 生成的对象将暴露给bean引用
 								object = postProcessObjectFromFactoryBean(object, beanName);
 							}
 							catch (Throwable ex) {
@@ -114,22 +120,29 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
 										"Post-processing of FactoryBean's singleton object failed", ex);
 							}
 						}
+						//进行缓存该对象
 						this.factoryBeanObjectCache.put(beanName, (object != null ? object : NULL_OBJECT));
 					}
 				}
+				//返回从FactoryBean拿到的bean
 				return (object != NULL_OBJECT ? object : null);
 			}
 		}
+		//这里说明是factory不是单例且beanName在缓存中找不到
 		else {
+			//1.从factoryBean中去拿
 			Object object = doGetObjectFromFactoryBean(factory, beanName);
+			//需要后置处理
 			if (object != null && shouldPostProcess) {
 				try {
+					//从factoryBean拿到object后对其后置处理逻辑,如暴露该bean
 					object = postProcessObjectFromFactoryBean(object, beanName);
 				}
 				catch (Throwable ex) {
 					throw new BeanCreationException(beanName, "Post-processing of FactoryBean's object failed", ex);
 				}
 			}
+			//最后返回该object
 			return object;
 		}
 	}

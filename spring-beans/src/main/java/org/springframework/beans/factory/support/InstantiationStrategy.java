@@ -49,6 +49,7 @@ public interface InstantiationStrategy {
 	 * @return a bean instance for this bean definition
 	 * @throws BeansException if the instantiation attempt failed
 	 */
+	//返回此工厂中具有给定名称的bean实例
 	Object instantiate(RootBeanDefinition bd, String beanName, BeanFactory owner)
 			throws BeansException;
 
@@ -65,6 +66,7 @@ public interface InstantiationStrategy {
 	 * @return a bean instance for this bean definition
 	 * @throws BeansException if the instantiation attempt failed
 	 */
+	//返回此工厂中具有给定名称的bean实例，并通过给定的构造函数创建它
 	Object instantiate(RootBeanDefinition bd, String beanName, BeanFactory owner,
 			Constructor<?> ctor, Object... args) throws BeansException;
 
@@ -83,6 +85,7 @@ public interface InstantiationStrategy {
 	 * @return a bean instance for this bean definition
 	 * @throws BeansException if the instantiation attempt failed
 	 */
+	//返回此工厂中具有给定名称的bean实例，并通过给定的工厂方法创建它
 	Object instantiate(RootBeanDefinition bd, String beanName, BeanFactory owner,
 			Object factoryBean, Method factoryMethod, Object... args) throws BeansException;
 

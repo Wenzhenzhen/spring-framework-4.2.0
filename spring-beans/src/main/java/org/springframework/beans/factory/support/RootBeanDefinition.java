@@ -69,7 +69,8 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	/** Package-visible field for caching the return type of a generically typed factory method */
 	volatile Class<?> resolvedFactoryMethodReturnType;
 
-	/** Package-visible field that marks the constructor arguments as resolved */
+	/** Package-visible field that marks the constructor arguments as resolved
+	 * 标记构造函数参数为已解析*/
 	boolean constructorArgumentsResolved = false;
 
 	/** Package-visible field for caching fully resolved constructor arguments */
@@ -83,7 +84,7 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	/** Package-visible field that indicates MergedBeanDefinitionPostProcessor having been applied */
 	boolean postProcessed = false;
 
-	/** Package-visible field that indicates a before-instantiation post-processor having kicked in */
+	/** 包可见的字段，指示实例化前的后处理器已启动*/
 	volatile Boolean beforeInstantiationResolved;
 
 	private Set<Member> externallyManagedConfigMembers;

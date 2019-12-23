@@ -135,8 +135,14 @@ beanFactoryPostProcessor1.postProcessBeanFactory(factory);
 ### IOC 之 Spring 统一资源加载策略
 Spring 提供了 Resource 和 ResourceLoader 来统一抽象整个资源及其定位
 
+# SpringIOC容器
+Spring IOC 容器所起的作用：以某种方式加载 Configuration Metadata，将其解析注册到容器内部，然后回根据这些信息绑定整个系统的对象，最终组装成一个可用的基于轻量级容器的应用系统。
+ Spring 在实现上述功能中，分为两个阶段：
+1. 容器初始化阶段
+2. 加载 bean 阶段
+## 一、容器初始化阶段
 ### IOC之加载bean
-```
+```java
 // 根据 Xml 配置文件创建 Resource 资源对象。ClassPathResource 是 Resource 接口的子类，bean.xml 文件中的内容是我们定义的 Bean 信息。
 ClassPathResource resource = new ClassPathResource("bean.xml");
 // 创建一个 BeanFactory，DefaultListableBeanFactory 是其子类，是真正可以独立使用的 IOC 容器，它是整个 Spring IOC 的始祖
@@ -251,3 +257,43 @@ public Document loadDocument(InputSource inputSource, EntityResolver entityResol
 ```
 ### IOC容器的初始化过程
 ![bean装载的过程](./SpringIOC容器示意图/spring-IOC容器初始化过程.png)
+
+
+## 二、加载bean阶段
+经过容器初始化阶段后，应用程序中定义的 bean 信息已经全部加载到系统中了，当我们显示或者隐式地调用 getBean() 时，则会触发加载 bean 阶段。
+在这阶段，容器会首先检查所请求的对象是否已经初始化完成了，如果没有，则会根据注册的 bean 信息实例化请求的对象，并为其注册依赖，然后将其返回给请求方。至此第二个阶段也已经完成。
+```java
+ public static void main( String[] args ){
+
+    XmlBeanFactory factory = new XmlBeanFactory(new ClassPathResource("applicationContext.xml"));
+    Object student = factory.getBean("student");
+    System.out.println(student);
+}
+```
+### IOC之循环依赖处理
+循环依赖在整个bean的加载过程中都有涉及，此处从整个 Bean 的加载过程进行分析。
+####1. 什么是循环依赖：
+* 循环依赖其实就是循环引用，就是两个或者两个以上的 bean 互相引用对方，最终形成一个闭环，如 A 依赖 B，B 依赖 C，C 依赖 A
+* Spring循环依赖的场景：
+    - 构造器的循环依赖
+    对于构造器的循环依赖，Spring 是无法解决的，只能抛出 BeanCurrentlyInCreationException 异常表示循环依赖
+    - field 属性的循环依赖
+    Spring 只解决 scope 为 singleton 的循环依赖，对于scope 为 prototype 的 bean Spring 无法解决，直接抛出 BeanCurrentlyInCreationException 异常。
+####2. Spring 解决循环依赖
+Spring 解决循环依赖的方案：
+* Spring 在创建 bean 的时候并不是等它完全完成，而是在创建过程中将创建中的 bean的 ObjectFactory 提前曝光
+（即加入到 singletonFactories 缓存中），这样一旦下一个 bean 创建的时候需要依赖 bean ，
+则直接使用 ObjectFactory 的 getObject() 获取了，也就是 getSingleton() 中的代码片段了。 
+到这里，关于 Spring 解决 bean 循环依赖就已经分析完毕了。
+* 最后来描述下就上面那个循环依赖 Spring 解决的过程：
+    - 首先 A 完成初始化第一步并将自己提前曝光出来（通过 ObjectFactory 将自己提前曝光）
+    - 在初始化的时候，发现自己依赖对象 B，此时就会去尝试 get(B)，这个时候发现 B 还没有被创建出来
+    - 然后 B 就走创建流程，在 B 初始化的时候，同样发现自己依赖 C，C 也没有被创建出来
+    - 这个时候 C 又开始初始化进程，但是在初始化的过程中发现自己依赖 A，于是尝试 get(A)
+    - 这个时候由于 A 已经添加至缓存中（一般都是添加至三级缓存 singletonFactories ），通过 ObjectFactory 提前曝光，所以可以通过 ObjectFactory.getObject() 拿到 A 对象
+    - C 拿到 A 对象后顺利完成初始化，然后将自己添加到一级缓存中，回到 B ，B 也可以拿到 C 对象，完成初始化
+    - A 可以顺利拿到 B 完成初始化。
+    - 到这里整个链路就已经完成了初始化过程了。
+
+加载bean总结 http://cmsblogs.com/?p=2905
+
