@@ -33,10 +33,12 @@ import java.lang.reflect.Method;
  * @since 1.1
  */
 
-/**
- *   实例化bean的策略接口
- *   使用了策略模式
- */
+// 实例化bean的策略接口,使用了策略模式
+// 实例化 bean有反射和 CGLIB 动态字节码两种方式
+// 根据创建对象情况的不同,提供了三种策略：无参构造方法、有参构造方法、工厂方法。
+// 子类 SimpleInstantiationStrategy 提供了基于反射来实例化对象的功能，但是不支持方法注入方式的对象实例化。
+// CglibSubclassingInstantiationStrategy 继承 SimpleInstantiationStrategy，他除了拥有父类以反射实例化对象的功能外，还提供了通过 CGLIB 的动态字节码的功能进而支持方法注入所需的对象实例化需求。
+
 public interface InstantiationStrategy {
 
 	/**
@@ -49,7 +51,7 @@ public interface InstantiationStrategy {
 	 * @return a bean instance for this bean definition
 	 * @throws BeansException if the instantiation attempt failed
 	 */
-	//返回此工厂中具有给定名称的bean实例
+	//默认构造方法
 	Object instantiate(RootBeanDefinition bd, String beanName, BeanFactory owner)
 			throws BeansException;
 
@@ -66,7 +68,7 @@ public interface InstantiationStrategy {
 	 * @return a bean instance for this bean definition
 	 * @throws BeansException if the instantiation attempt failed
 	 */
-	//返回此工厂中具有给定名称的bean实例，并通过给定的构造函数创建它
+	//指定构造方法
 	Object instantiate(RootBeanDefinition bd, String beanName, BeanFactory owner,
 			Constructor<?> ctor, Object... args) throws BeansException;
 
@@ -85,7 +87,7 @@ public interface InstantiationStrategy {
 	 * @return a bean instance for this bean definition
 	 * @throws BeansException if the instantiation attempt failed
 	 */
-	//返回此工厂中具有给定名称的bean实例，并通过给定的工厂方法创建它
+	//工厂方法
 	Object instantiate(RootBeanDefinition bd, String beanName, BeanFactory owner,
 			Object factoryBean, Method factoryMethod, Object... args) throws BeansException;
 

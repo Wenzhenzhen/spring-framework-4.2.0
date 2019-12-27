@@ -54,7 +54,13 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 		return currentlyInvokedFactoryMethod.get();
 	}
 
+	/**
+	 * @see AbstractBeanDefinition#methodOverrides
+	 */
+	// 构造方法实例化,先判断是否有 MethodOverrides，如果没有则是直接使用反射，如果有则就需要 CGLIB 实例化对象。
+	// 在Spring中多处使用了代理，比如对lookup-method和replace-method的处理；AOP的实现
 
+	//默认构造方法
 	@Override
 	public Object instantiate(RootBeanDefinition bd, String beanName, BeanFactory owner) {
 		// Don't override the class with CGLIB if no overrides.
@@ -106,6 +112,7 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 		throw new UnsupportedOperationException("Method Injection not supported in SimpleInstantiationStrategy");
 	}
 
+	//指定构造方法
 	@Override
 	public Object instantiate(RootBeanDefinition bd, String beanName, BeanFactory owner,
 			final Constructor<?> ctor, Object... args) {

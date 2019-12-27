@@ -25,6 +25,7 @@ package org.springframework.core.convert;
  * @since 3.0
  */
 //类型转换服务,是进入转换系统的入口点。
+// ConversionService 是 Spring 自 3.0 后推出来用来替代 PropertyEditor 转换模式的转换体系
 public interface ConversionService {
 
 	/**
@@ -61,6 +62,7 @@ public interface ConversionService {
 	 * {@code false} if not
 	 * @throws IllegalArgumentException if {@code targetType} is {@code null}
 	 */
+	// canConvert() 用于判 sourceType 能否转成 targetType
 	boolean canConvert(TypeDescriptor sourceType, TypeDescriptor targetType);
 
 	/**
@@ -71,6 +73,7 @@ public interface ConversionService {
 	 * @throws ConversionException if a conversion exception occurred
 	 * @throws IllegalArgumentException if targetType is null
 	 */
+	// convert() 用于将 source 转成转入的 TargetType 类型实例
 	<T> T convert(Object source, Class<T> targetType);
 
 	/**
@@ -86,6 +89,9 @@ public interface ConversionService {
 	 * @throws IllegalArgumentException if targetType is {@code null},
 	 * or {@code sourceType} is {@code null} but source is not {@code null}
 	 */
+	// convert() 将给定的源对象 source 转换为指定的 targetType。
+	// TypeDescriptors 提供有关发生转换的源位置和目标位置的附加上下文，通常是对象字段或属性位置。
+	// 方法实现在子类GenericConversionService 中
 	Object convert(Object source, TypeDescriptor sourceType, TypeDescriptor targetType);
 
 }

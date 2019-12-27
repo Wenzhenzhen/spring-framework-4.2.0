@@ -33,9 +33,13 @@ import java.lang.reflect.Field;
  * @see SimpleTypeConverter
  * @see BeanWrapperImpl
  */
-//类型转换器。
+// 类型转换器。
+// TypeConverter 是定义类型转换方法的接口，通常情况下与 PropertyEditorRegistry 配合使用实现类型转换。
 public interface TypeConverter {
 
+	// convertIfNecessary() 的实现者有两个：DataBinder 和 TypeConverterSupport ，
+	// 其中 DataBinder 主要用于参数绑定（熟悉 Spring MVC 的都应该知道这个类），
+	// TypeConverterSupport 则是 TypeConverter 的基本实现，使用的是 package-private 策略。
 	/**
 	 * Convert the value to the required type (if necessary from a String).
 	 * <p>Conversions from String to any type will typically use the {@code setAsText}

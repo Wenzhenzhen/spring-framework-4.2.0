@@ -30,7 +30,10 @@ import org.springframework.core.convert.ConversionService;
  * @since 2.0
  * @see BeanWrapper
  */
-//封装了PropertyAccessor的配置方法
+// 接口集成及扩展:
+// 1.ConfigurablePropertyAccessor继承了三个接口，具有三重身份：属性编辑器，属性编辑器注册表，类型转换器
+// 2.setConversionService() 和 getConversionService() 集成 Spring 的 ConversionService 类型转换体系。
+
 public interface ConfigurablePropertyAccessor extends PropertyAccessor, PropertyEditorRegistry, TypeConverter {
 
 	/**

@@ -168,6 +168,8 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 
     private MutablePropertyValues propertyValues;
 
+    // 在解析<bean> 标签时，将lookup-method 和 replaced-method分别解析为LookupOverride 和ReplaceOverride 对象
+    // 并将其加入methodOverrides中，当实例化bean时再使用
     private MethodOverrides methodOverrides = new MethodOverrides();
 
     private String factoryBeanName;

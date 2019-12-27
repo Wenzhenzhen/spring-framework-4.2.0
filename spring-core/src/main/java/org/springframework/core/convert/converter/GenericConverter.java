@@ -44,6 +44,10 @@ import org.springframework.util.Assert;
  * @see ConverterFactory
  * @see ConditionalConverter
  */
+// GenericConverter 是一个转换接口，一个用于在两种或更多种类型之间转换的通用型转换器接口。
+// 它是 Converter SPI 体系中最灵活的，也是最复杂的接口，
+// 灵活性在于 GenericConverter 可以支持在多个源/目标类型对之间进行转换，
+// 同时也可以在类型转换过程中访问源/目标字段上下文。由于该接口足够复杂，所有当更简单的 Converter 或 ConverterFactory 接口足够使用时，通常不应使用此接口。
 public interface GenericConverter {
 
 	/**

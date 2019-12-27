@@ -24,6 +24,10 @@ package org.springframework.core.env;
  * @see Environment
  * @see PropertySourcesPropertyResolver
  */
+// 属性解析器，用于解析任何基础源的属性的接口,
+// 根据key或者目标类型来查找属性值;替换文本中的占位符（${key}）到属性值
+// properties 有多种来源：属性文件，JVM 系统属性，系统环境变量，JNDI，servlet 上下文参数，ad-hoc 属性对象，映射等
+
 public interface PropertyResolver {
 
 	/**
@@ -105,6 +109,7 @@ public interface PropertyResolver {
 	 * @see #resolveRequiredPlaceholders
 	 * @see org.springframework.util.SystemPropertyUtils#resolvePlaceholders(String)
 	 */
+	// 替换文本中的占位符（${key}）到属性值，找不到不解析
 	String resolvePlaceholders(String text);
 
 	/**
@@ -116,6 +121,7 @@ public interface PropertyResolver {
 	 * or if any placeholders are unresolvable
 	 * @see org.springframework.util.SystemPropertyUtils#resolvePlaceholders(String, boolean)
 	 */
+	// 替换文本中的占位符（${key}）到属性值，找不到抛出异常IllegalArgumentException
 	String resolveRequiredPlaceholders(String text) throws IllegalArgumentException;
 
 }

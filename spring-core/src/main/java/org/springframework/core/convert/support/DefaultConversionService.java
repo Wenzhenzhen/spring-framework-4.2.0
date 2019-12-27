@@ -40,6 +40,8 @@ import org.springframework.util.ClassUtils;
  */
 public class DefaultConversionService extends GenericConversionService {
 
+	// ConversionService 接口的默认实现，适用于大部分条件下的转换工作。
+
 	/** Java 8's java.util.Optional class available? */
 	private static final boolean javaUtilOptionalClassAvailable =
 			ClassUtils.isPresent("java.util.Optional", DefaultConversionService.class.getClassLoader());

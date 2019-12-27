@@ -297,3 +297,41 @@ Spring 解决循环依赖的方案：
 
 加载bean总结 http://cmsblogs.com/?p=2905
 
+
+#### Spring 在 bean 初始化时进行三个检测扩展，也就是说我们可以对 bean 进行三个不同的定制化处理
+* Aware接口
+* BeanPostProcessor
+* InitializingBean 接口和 init-method 方法
+
+1. 在bean的初始化方法invokeInitMethods()中：
+首先检测当前 bean 是否实现了 InitializingBean 接口，如果实现了则调用其 afterPropertiesSet()，然后再检查是否也指定了 init-method()，如果指定了则通过反射机制调用指定的 init-method()。
+    - Spring 的 InitializingBean 接口为 bean 提供了定义初始化方法的方式，它仅包含了一个方法：afterPropertiesSet()。 该方法在 BeanFactory 设置完了所有属性之后被调用
+    -  <bean> 标签的 init-method 属性在 bean 初始化时指定执行方法，可以用来替代实现 InitializingBean 接口。
+2. 从 invokeInitMethods() 中，我们知道 init-method 指定的方法会在 afterPropertiesSet() 之后执行，如果 afterPropertiesSet() 中出现了异常，则 init-method 是不会执行的，而且由于 init-method 采用的是反射执行的方式，所以 afterPropertiesSet() 的执行效率一般会高些，但是并不能排除我们要优先使用 init-method，主要是因为它消除了 bean 对 Spring 的依赖，Spring 没有侵入到我们业务代码，这样会更加符合 Spring 的理念。诚然，init-method 是基于 xml 配置文件的，就目前而言，我们的工程几乎都摒弃了配置，而采用注释的方式，那么 @PreDestory 可能适合你，当然这个注解我们后面分析。
+3. 对于DisposableBean 和 destory-method，他们和 init 相似，这里就不做阐述了。
+
+
+### Spring环境&属性 PropertySource、Environment、Profile
+spring.profiles.active 和 @Profile 的主要功能是实现不同环境下（开发、测试、生产）参数配置的切换。
+
+Spring 环境 & 属性由四个部分组成：PropertySource、PropertyResolver、Profile 和 Environment。
+* PropertySource：属性源，key-value 属性对抽象，用于配置数据。
+* PropertyResolver：属性解析器，用于解析属性配置
+* Profile：剖面，只有激活的剖面的组件/配置才会注册到 Spring 容器，类似于 Spring Boot 中的 profile
+* Environment：环境，Profile 和 PropertyResolver 的组合。
+
+
+### Bean的生命周期
+Spring 容器将会对其所有管理的 Bean 对象全部给予一个统一的生命周期管理，同时在这个阶段我们也可以对其进行干涉（比如对 bean 进行增强处理，对 bean 进行篡改）
+1. 解析为BeanDefinition，put到DefaultListableBeanFactory的beanDefinitionMap中（实现SingletonBeanRegistry接口和功能）
+2. bean的实例化过程
+    - 反射创建对象
+    - 注入对象属性
+    - 检查激活Aware
+    - BeanPostProcessor前置处理
+    - 检查调用 InitializingBean接口和init-method中的方法
+    - BeanPostProcessor后置处理
+    - 注册必要的Destruction回调
+    - 将bean放入单例缓存池
+3. 使用bean，最后检查DisposableBean和 destroy-method调用
+

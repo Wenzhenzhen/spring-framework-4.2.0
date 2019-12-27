@@ -28,6 +28,8 @@ package org.springframework.core.convert.converter;
  * @param <S> the source type
  * @param <T> the target type
  */
+// Converter 是一个将 S 类型的源对象转换为 T 类型的目标对象的转换器。
+// 该接口是线程安全的，所以可以共享。
 public interface Converter<S, T> {
 
 	/**

@@ -198,7 +198,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
      *      五、 获取 RootBeanDefinition，并对其进行合并检查。（若父类不为null会合并父类属性）
      *      六、 依赖检查(depends-on属性)。某个 bean 依赖其他 bean ，则需要先加载依赖的 bean。
      *      七、 各Scope的bean的创建，Spring中有Singleton,prototype,其他(其他包括 request、session、global session)
-     *           主要是{@link AbstractBeanFactory#createBean(String, RootBeanDefinition, Object[])}
+         *           主要是{@link AbstractBeanFactory#createBean(String, RootBeanDefinition, Object[])}
      *           默认实现在{@link AbstractAutowireCapableBeanFactory#createBean(String, RootBeanDefinition, Object[])}
      *      八、 类型转换
      */

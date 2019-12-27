@@ -73,12 +73,14 @@ public class BeanDefinitionVisitor {
 	 * @param beanDefinition the BeanDefinition object to traverse
 	 * @see #resolveStringValue(String)
 	 */
+	// 访问BeanDefinition中的 parent 、class 、factory-bean 、factory-method 、scope 、property 、constructor-arg
 	public void visitBeanDefinition(BeanDefinition beanDefinition) {
 		visitParentName(beanDefinition);
 		visitBeanClassName(beanDefinition);
 		visitFactoryBeanName(beanDefinition);
 		visitFactoryMethodName(beanDefinition);
 		visitScope(beanDefinition);
+		// 访问property
 		visitPropertyValues(beanDefinition.getPropertyValues());
 		ConstructorArgumentValues cas = beanDefinition.getConstructorArgumentValues();
 		visitIndexedArgumentValues(cas.getIndexedArgumentValues());
@@ -135,8 +137,10 @@ public class BeanDefinitionVisitor {
 		}
 	}
 
+	// 参数是BeanDefinition中的属性
 	protected void visitPropertyValues(MutablePropertyValues pvs) {
 		PropertyValue[] pvArray = pvs.getPropertyValues();
+		// 遍历所有属性，调用 resolveValue() 对属性进行解析获取最新值，如果新值和旧值不等，则用新值替换旧值。
 		for (PropertyValue pv : pvArray) {
 			Object newVal = resolveValue(pv.getValue());
 			if (!ObjectUtils.nullSafeEquals(newVal, pv.getValue())) {
@@ -205,6 +209,7 @@ public class BeanDefinitionVisitor {
 				typedStringValue.setValue(visitedString);
 			}
 		}
+		// 解析String类型的
 		else if (value instanceof String) {
 			return resolveStringValue((String) value);
 		}

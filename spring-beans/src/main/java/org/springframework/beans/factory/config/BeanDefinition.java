@@ -21,8 +21,7 @@ import org.springframework.beans.MutablePropertyValues;
 import org.springframework.core.AttributeAccessor;
 
 /**
- * BeanDefinition 描述了一个bean实例，包括属性值，构造方法值和继承自它的类的更多信息.
- *
+ *  BeanDefinition 描述了一个bean实例，包括属性值，构造方法值和继承自它的类的更多信息.
  * <p>This is just a minimal interface: The main intention is to allow a
  * {@link BeanFactoryPostProcessor} such as {@link PropertyPlaceholderConfigurer}
  * to introspect and modify property values and other bean metadata.
@@ -32,15 +31,16 @@ import org.springframework.core.AttributeAccessor;
  * @since 19.03.2004
  * @see ConfigurableListableBeanFactory#getBeanDefinition
  */
- //三个常用实现类：均继承自AbstractBeanDefinition
 
+
+ //三个常用实现类：均继承自AbstractBeanDefinition
  /**
  * @see org.springframework.beans.factory.support.AbstractBeanDefinition
- *
  * @see org.springframework.beans.factory.support.RootBeanDefinition
  * @see org.springframework.beans.factory.support.ChildBeanDefinition
  * @see org.springframework.beans.factory.support.GenericBeanDefinition
  */
+
  //如果配置文件中定义了父 <bean> 和 子 <bean> ，则父 <bean> 用 RootBeanDefinition表示;
  //子 <bean> 用 ChildBeanDefinition 表示，而没有父 <bean> 的就使用RootBeanDefinition 表示;
  //GenericBeanDefinition 为一站式服务类。
@@ -49,6 +49,9 @@ import org.springframework.core.AttributeAccessor;
  //AttributeAccessor 定义了与其它对象的（元数据）进行连接和访问的约定，即对属性的修改，包括获取、设置、删除。
  //BeanMetadataElement Bean 元对象持有的配置元素可以通过getSource() 方法来获取。
 
+ // BeanDefinition是Spring中的建模对象，就是把一个bean实例化出来的模型对象。Class也就是我们通常说的类对象，就是一个普通对象的建模对象
+ // spring当中的BeanDefinition就相当于java当中的Class。Class可以用来描述一个类的属性和方法等等其他信息；
+ // BeanDefintion可以描述springbean当中的scope、lazy，以及属性和方法等等其他信息
 public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 
 	/**

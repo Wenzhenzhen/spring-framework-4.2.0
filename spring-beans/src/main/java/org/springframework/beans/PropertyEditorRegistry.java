@@ -33,6 +33,8 @@ import java.beans.PropertyEditor;
  * @see org.springframework.validation.DataBinder
  */
 //属性编辑器注册中心。
+// PropertyEditorRegistry 就是用于 PropertyEditor 的注册和发现，
+// 而 PropertyEditor 是 Java 内省里面的接口，用于改变指定 property 属性的类型。
 public interface PropertyEditorRegistry {
 
 	/**

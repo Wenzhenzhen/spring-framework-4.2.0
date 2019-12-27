@@ -120,11 +120,20 @@ public class PropertyPlaceholderHelper {
 	 */
 	public String replacePlaceholders(String value, PlaceholderResolver placeholderResolver) {
 		Assert.notNull(value, "'value' must not be null");
+		//调用 parseStringValue()，${} 占位符的替换：
 		return parseStringValue(value, placeholderResolver, new HashSet<String>());
 	}
 
-	protected String parseStringValue(
-			String strVal, PlaceholderResolver placeholderResolver, Set<String> visitedPlaceholders) {
+  	// 此方法流程：
+	// 1. 获取占位符前缀 "${" 的索引位置 startIndex
+  	// 2. 如果前缀 "${" 存在，则从 “{” 后面开始获取占位符后缀 "}" 的索引位置 endIndex
+  	// 3. 如果前缀 “${” 和后缀 "}" 都存在，则截取中间部分 placeholder
+  	// 4. 从 Properties 中获取 placeHolder 对应的值 propVal
+  	// 5. 如果 propVal 为空，则判断占位符中是否存在 ":"，如果存在则对占位符进行分割处理，前面部分为 actualPlaceholder，后面部分 defaultValue，尝试从
+  	// Properties 中获取 actualPlaceholder 对应的值 propVal，如果不存在，则将 defaultValue 的值赋值给 propVal
+  	// 6. 返回 propVal，也就是 Properties 中对应的值
+  	protected String parseStringValue(
+  			String strVal, PlaceholderResolver placeholderResolver, Set<String> visitedPlaceholders) {
 
 		StringBuilder result = new StringBuilder(strVal);
 

@@ -60,6 +60,9 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 // • 资源访问，如URL和文件
 // • 事件传播
 // • 载入多个（有继承关系）上下文 ，使得每一个上下文都专注于一个特定的层次，比如应用的web层;
+
+// ApplicationContext 有两个直接子接口：WebApplicationContext 和 ConfigurableApplicationContext。
+
 public interface ApplicationContext
     extends EnvironmentCapable,
         ListableBeanFactory,

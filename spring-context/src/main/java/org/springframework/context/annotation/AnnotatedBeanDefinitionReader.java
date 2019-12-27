@@ -41,6 +41,17 @@ import org.springframework.util.Assert;
  * @since 3.0
  * @see AnnotationConfigApplicationContext#register
  */
+// 作用：
+// 1.可用于编程式动态注册一个带注解的bean,1、主要是可以动态、显式的注册一个bean；
+// 2.具备解析一个类的功能，可以代替ClassPathBeanDefinitionScanner这个类，具备相同的注解解析功能
+// 应用场景:
+// 1.可以显示、动态注册一个程序员提供的bean
+// 2.在初始化spring容器的过程中他完成了对配置类(可以简单的理解为加了@Configuration和@ComponentScan注解的类)的注册和解析功能；
+// 为什么配置类需要手动注册呢？
+// 因为配置类无法扫描出来，所以需要我们手动注册。
+// spring完成扫描是需要解析配置类当中的@ComponentScan注解的值（一般是一个包名），
+// 得到这个值之后去扫描这个值所代表的包下面的所有bean；所以配置类要在一开始就手动注册给spring，
+// spring得到配置类之后把他解析成BeanDefintion对象，继而去获取@ComponentScan的值然后才开始扫描其他bean；
 public class AnnotatedBeanDefinitionReader {
 
 	private final BeanDefinitionRegistry registry;
@@ -117,6 +128,7 @@ public class AnnotatedBeanDefinitionReader {
 				(scopeMetadataResolver != null ? scopeMetadataResolver : new AnnotationScopeMetadataResolver());
 	}
 
+	// 把一个类解析成BeanDefintion对象，然后把这个对象put到beanDefinitionMap当中
 	public void register(Class<?>... annotatedClasses) {
 		for (Class<?> annotatedClass : annotatedClasses) {
 			registerBean(annotatedClass);

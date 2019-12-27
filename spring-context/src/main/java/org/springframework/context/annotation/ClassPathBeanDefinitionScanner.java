@@ -59,6 +59,7 @@ import org.springframework.util.PatternMatchUtils;
  * @see org.springframework.stereotype.Service
  * @see org.springframework.stereotype.Controller
  */
+//spring完成扫描的核心类,spring完成扫描主要是依靠ClassPathBeanDefinitionScanner这个类的对象
 public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateComponentProvider {
 
 	private final BeanDefinitionRegistry registry;

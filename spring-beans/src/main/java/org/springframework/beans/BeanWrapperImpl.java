@@ -58,6 +58,8 @@ import java.security.*;
  */
 //可以根据需求，将集合与数组的值转换到对应目标对象的集合和数组.
 //自定义的属性编辑器通过属性编辑器的setValue，setAsText方法实现上述的转换功能。
+// BeanWrapper 接口的默认实现，用于对Bean的包装
+
 public class BeanWrapperImpl extends AbstractNestablePropertyAccessor implements BeanWrapper {
 
     /**

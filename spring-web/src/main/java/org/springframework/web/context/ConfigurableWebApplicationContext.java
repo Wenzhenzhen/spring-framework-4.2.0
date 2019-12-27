@@ -37,6 +37,7 @@ import org.springframework.context.ConfigurableApplicationContext;
  * @see ContextLoader#createWebApplicationContext
  * @see org.springframework.web.servlet.FrameworkServlet#createWebApplicationContext
  */
+// 可配置、可管理、可关闭的WebApplicationContext
 public interface ConfigurableWebApplicationContext extends WebApplicationContext, ConfigurableApplicationContext {
 
 	/**

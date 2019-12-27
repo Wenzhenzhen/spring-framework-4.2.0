@@ -25,9 +25,10 @@ package org.springframework.core.convert.converter;
  * @since 3.0
  * @see ConditionalConverter
  * @param <S> the source type converters created by this factory can convert from
- * @param <R> the target range (or base) type converters created by this factory can convert to;
- * for example {@link Number} for a set of number subtypes.
+ * @param <R> the target range (or base) type converters created by this factory can convert to; for
+ *     example {@link Number} for a set of number subtypes.
  */
+// 一个用于“远程”转换的转换工厂，可以将对象从 S 转换为 R 的子类型T。
 public interface ConverterFactory<S, R> {
 
 	/**

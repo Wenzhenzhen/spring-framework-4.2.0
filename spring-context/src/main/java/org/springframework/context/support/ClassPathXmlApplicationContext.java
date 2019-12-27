@@ -23,24 +23,24 @@ import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 
 /**
- * Standalone XML application context, taking the context definition files
- * from the class path, interpreting plain paths as class path resource names
- * that include the package path (e.g. "mypackage/myresource.txt"). Useful for
- * test harnesses as well as for application contexts embedded within JARs.
+ * Standalone XML application context, taking the context definition files from the class path,
+ * interpreting plain paths as class path resource names that include the package path (e.g.
+ * "mypackage/myresource.txt"). Useful for test harnesses as well as for application contexts
+ * embedded within JARs.
  *
- * <p>The config location defaults can be overridden via {@link #getConfigLocations},
- * Config locations can either denote concrete files like "/myfiles/context.xml"
- * or Ant-style patterns like "/myfiles/*-context.xml" (see the
- * {@link org.springframework.util.AntPathMatcher} javadoc for pattern details).
+ * <p>The config location defaults can be overridden via {@link #getConfigLocations}, Config
+ * locations can either denote concrete files like "/myfiles/context.xml" or Ant-style patterns like
+ * "/myfiles/*-context.xml" (see the {@link org.springframework.util.AntPathMatcher} javadoc for
+ * pattern details).
  *
- * <p>Note: In case of multiple config locations, later bean definitions will
- * override ones defined in earlier loaded files. This can be leveraged to
- * deliberately override certain bean definitions via an extra XML file.
+ * <p>Note: In case of multiple config locations, later bean definitions will override ones defined
+ * in earlier loaded files. This can be leveraged to deliberately override certain bean definitions
+ * via an extra XML file.
  *
- * <p><b>This is a simple, one-stop shop convenience ApplicationContext.
- * Consider using the {@link GenericApplicationContext} class in combination
- * with an {@link org.springframework.beans.factory.xml.XmlBeanDefinitionReader}
- * for more flexible context setup.</b>
+ * <p><b>This is a simple, one-stop shop convenience ApplicationContext. Consider using the {@link
+ * GenericApplicationContext} class in combination with an {@link
+ * org.springframework.beans.factory.xml.XmlBeanDefinitionReader} for more flexible context
+ * setup.</b>
  *
  * @author Rod Johnson
  * @author Juergen Hoeller
@@ -48,6 +48,17 @@ import org.springframework.util.Assert;
  * @see #getResourceByPath
  * @see GenericApplicationContext
  */
+// ClassPathXmlApplicationContext 设计的顶级接口有：
+// BeanFactory：Spring 容器 Bean 的管理
+// MessageSource：管理 message ，实现国际化等功能
+// ApplicationEventPublisher：事件发布
+// ResourcePatternResolver：资源加载
+// EnvironmentCapable：系统 Environment（profile + Properties） 相关
+// Lifecycle：对 context 生命周期的管理，它提供 start() 和 stop() 方法启动和暂停组件。
+// Closeable：标准 JDK 所提供的一个接口，用于最后关闭组件释放资源等。
+// InitializingBean：自定义初始化
+// BeanNameAware：设置 beanName 的 Aware 接口
+
 public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContext {
 
 	private Resource[] configResources;

@@ -330,7 +330,7 @@ public class ContextLoader {
 						cwac.setParent(parent);  //parent为null
 					}
 					//一些WebApplicationContext的设置如：id，servletContext，configLocation（在web.xml中有配置）。
-					//把servletcontext和ServletConfig放到environment中
+					// 把servletcontext和ServletConfig放到environment中
 					// 执行自定义的ApplicationContextInitializer
 					// 最后调用refresh方法，启动ioc容器。
 					configureAndRefreshWebApplicationContext(cwac, servletContext);

@@ -35,6 +35,7 @@ public abstract class TypeConverterSupport extends PropertyEditorRegistrySupport
 	TypeConverterDelegate typeConverterDelegate;
 
 
+	// TypeConverter 的 convertIfNecessary() 方法实现
 	@Override
 	public <T> T convertIfNecessary(Object value, Class<T> requiredType) throws TypeMismatchException {
 		return doConvert(value, requiredType, null, null);

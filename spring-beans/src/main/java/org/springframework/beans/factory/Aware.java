@@ -34,6 +34,12 @@ package org.springframework.beans.factory;
  * @author Chris Beams
  * @since 3.1
  */
+// 这是一个具有标识作用的超级接口，实现了此接口的 bean 是具有被 Spring 容器通知的能力，通知的方式是采用回调的方式。
+// Aware 的含义是感知的、感应的，那么在 Spring 容器中是如何实现感知并设置属性值得呢？
+// 我们可以从初始化 bean 方法initializeBean()中调用的激活 Aware 的方法 invokeAwareMethods() 中看到一点点：
+    //其实就是Spring 容器在初始化主动检测当前 bean 是否实现了 Aware 接口，
+    // 如果实现了则回调其 set 方法将相应的参数设置给该 bean ，
+    // 这个时候该 bean 就从 Spring 容器中取得相应的资源。
 public interface Aware {
 
 }

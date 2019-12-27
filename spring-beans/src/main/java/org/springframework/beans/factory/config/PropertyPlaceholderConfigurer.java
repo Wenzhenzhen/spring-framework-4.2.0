@@ -28,31 +28,35 @@ import org.springframework.util.PropertyPlaceholderHelper.PlaceholderResolver;
 import org.springframework.util.StringValueResolver;
 
 /**
- * {@link PlaceholderConfigurerSupport} subclass that resolves ${...} placeholders
- * against {@link #setLocation local} {@link #setProperties properties} and/or system properties
- * and environment variables.
+ * {@link PlaceholderConfigurerSupport} subclass that resolves ${...} placeholders against {@link
+ * #setLocation local} {@link #setProperties properties} and/or system properties and environment
+ * variables.
  *
- * <p>As of Spring 3.1, {@link org.springframework.context.support.PropertySourcesPlaceholderConfigurer
- * PropertySourcesPlaceholderConfigurer} should be used preferentially over this implementation; it is
- * more flexible through taking advantage of the {@link org.springframework.core.env.Environment Environment} and
- * {@link org.springframework.core.env.PropertySource PropertySource} mechanisms also made available in Spring 3.1.
+ * <p>As of Spring 3.1, {@link
+ * org.springframework.context.support.PropertySourcesPlaceholderConfigurer
+ * PropertySourcesPlaceholderConfigurer} should be used preferentially over this implementation; it
+ * is more flexible through taking advantage of the {@link org.springframework.core.env.Environment
+ * Environment} and {@link org.springframework.core.env.PropertySource PropertySource} mechanisms
+ * also made available in Spring 3.1.
  *
  * <p>{@link PropertyPlaceholderConfigurer} is still appropriate for use when:
+ *
  * <ul>
- * <li>the {@code spring-context} module is not available (i.e., one is using Spring's
- * {@code BeanFactory} API as opposed to {@code ApplicationContext}).
- * <li>existing configuration makes use of the {@link #setSystemPropertiesMode(int) "systemPropertiesMode"} and/or
- * {@link #setSystemPropertiesModeName(String) "systemPropertiesModeName"} properties. Users are encouraged to move
- * away from using these settings, and rather configure property source search order through the container's
- * {@code Environment}; however, exact preservation of functionality may be maintained by continuing to
- * use {@code PropertyPlaceholderConfigurer}.
+ *   <li>the {@code spring-context} module is not available (i.e., one is using Spring's {@code
+ *       BeanFactory} API as opposed to {@code ApplicationContext}).
+ *   <li>existing configuration makes use of the {@link #setSystemPropertiesMode(int)
+ *       "systemPropertiesMode"} and/or {@link #setSystemPropertiesModeName(String)
+ *       "systemPropertiesModeName"} properties. Users are encouraged to move away from using these
+ *       settings, and rather configure property source search order through the container's {@code
+ *       Environment}; however, exact preservation of functionality may be maintained by continuing
+ *       to use {@code PropertyPlaceholderConfigurer}.
  * </ul>
  *
- * <p>Prior to Spring 3.1, the {@code <context:property-placeholder/>} namespace element
- * registered an instance of {@code PropertyPlaceholderConfigurer}. It will still do so if
- * using the {@code spring-context-3.0.xsd} definition of the namespace. That is, you can preserve
- * registration of {@code PropertyPlaceholderConfigurer} through the namespace, even if using Spring 3.1;
- * simply do not update your {@code xsi:schemaLocation} and continue using the 3.0 XSD.
+ * <p>Prior to Spring 3.1, the {@code <context:property-placeholder/>} namespace element registered
+ * an instance of {@code PropertyPlaceholderConfigurer}. It will still do so if using the {@code
+ * spring-context-3.0.xsd} definition of the namespace. That is, you can preserve registration of
+ * {@code PropertyPlaceholderConfigurer} through the namespace, even if using Spring 3.1; simply do
+ * not update your {@code xsi:schemaLocation} and continue using the 3.0 XSD.
  *
  * @author Juergen Hoeller
  * @author Chris Beams
@@ -62,6 +66,13 @@ import org.springframework.util.StringValueResolver;
  * @see PropertyOverrideConfigurer
  * @see org.springframework.context.support.PropertySourcesPlaceholderConfigurer
  */
+// PropertyPlaceholderConfigurer 允许我们用 Properties 文件中的属性来定义应用上下文（配置文件或者注解）
+// 就是说我们在 XML 配置文件（或者其他方式，如注解方式）中使用占位符的方式来定义一些资源，
+// 并将这些占位符所代表的资源配置到 Properties 中，这样只需要对 Properties 文件进行修改即可
+	// 主要使用场景有:
+	// 1.动态加载配置文件，多环境切换
+	// 2.属性加解密
+
 public class PropertyPlaceholderConfigurer extends PlaceholderConfigurerSupport {
 
 	/** Never check system properties. */
@@ -218,7 +229,9 @@ public class PropertyPlaceholderConfigurer extends PlaceholderConfigurerSupport 
 	protected void processProperties(ConfigurableListableBeanFactory beanFactoryToProcess, Properties props)
 			throws BeansException {
 
+		// StringValueResolver 为一个解析 String 类型值的策略接口，该接口提供了 resolveStringValue() 方法用于解析 String 值。
 		StringValueResolver valueResolver = new PlaceholderResolvingStringValueResolver(props);
+		// 真正的替换操作，该方法在父类PlaceholderConfigurerSupport中实现
 		doProcessProperties(beanFactoryToProcess, valueResolver);
 	}
 
@@ -241,8 +254,10 @@ public class PropertyPlaceholderConfigurer extends PlaceholderConfigurerSupport 
 	}
 
 
+	//内部类
 	private class PlaceholderResolvingStringValueResolver implements StringValueResolver {
 
+		// 进行替换
 		private final PropertyPlaceholderHelper helper;
 
 		private final PlaceholderResolver resolver;
@@ -253,8 +268,16 @@ public class PropertyPlaceholderConfigurer extends PlaceholderConfigurerSupport 
 			this.resolver = new PropertyPlaceholderConfigurerResolver(props);
 		}
 
+		// helper 为 PropertyPlaceholderHelper 实例对象，
+		// 而 PropertyPlaceholderHelper 则是处理应用程序中包含占位符的字符串工具类。
+		// 在构造 helper 实例对象时需要传入了几个参数：placeholderPrefix、placeholderSuffix、valueSeparator，
+		// 这些值在 PlaceholderConfigurerSupport 中定义如下：
+		// protected String placeholderPrefix = "${";
+		// protected String placeholderSuffix = "}";
+		// protected String valueSeparator = ":";
 		@Override
 		public String resolveStringValue(String strVal) throws BeansException {
+			//调用 replacePlaceholders() 进行占位符替换
 			String value = this.helper.replacePlaceholders(strVal, this.resolver);
 			return (value.equals(nullValue) ? null : value);
 		}
@@ -269,6 +292,7 @@ public class PropertyPlaceholderConfigurer extends PlaceholderConfigurerSupport 
 			this.props = props;
 		}
 
+		// 用于返回占位符的替换值
 		@Override
 		public String resolvePlaceholder(String placeholderName) {
 			return PropertyPlaceholderConfigurer.this.resolvePlaceholder(placeholderName, props, systemPropertiesMode);

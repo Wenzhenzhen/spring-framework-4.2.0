@@ -1589,6 +1589,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
                 boolean convertible = bw.isWritableProperty(propertyName) &&
                         !PropertyAccessorUtils.isNestedOrIndexedProperty(propertyName);
                 if (convertible) {
+                    // 属性转换
                     convertedValue = convertForProperty(resolvedValue, propertyName, bw, converter);
                 }
                 // Possibly store converted value in merged bean definition,
@@ -1632,10 +1633,15 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
     /**
      * Convert the given value for the specified target property.
      */
+    // 属性转换
     private Object convertForProperty(Object value, String propertyName, BeanWrapper bw, TypeConverter converter) {
         if (converter instanceof BeanWrapperImpl) {
+            //若 TypeConverter 为 BeanWrapperImpl 类型，则使用 BeanWrapperImpl 来进行类型转换，
+            // 这里主要是因为 BeanWrapperImpl 实现了 PropertyEditorRegistry 接口。
             return ((BeanWrapperImpl) converter).convertForProperty(value, propertyName);
         } else {
+            // 否则则调用 TypeConverter 的 convertIfNecessary() 进行类型转换。
+            // TypeConverter 是定义类型转换方法的接口，通常情况下与 PropertyEditorRegistry 配合使用实现类型转换。
             PropertyDescriptor pd = bw.getPropertyDescriptor(propertyName);
             MethodParameter methodParam = BeanUtils.getWriteMethodParameter(pd);
             return converter.convertIfNecessary(value, pd.getPropertyType(), methodParam);

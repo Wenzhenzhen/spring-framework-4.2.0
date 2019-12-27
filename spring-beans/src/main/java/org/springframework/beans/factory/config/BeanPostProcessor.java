@@ -67,7 +67,7 @@ public interface BeanPostProcessor {
        * @throws org.springframework.beans.BeansException in case of errors
        * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet
        */
-      // 初始化前的后期处理
+      // bean初始化前调用此方法
     Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException;
 
     /**
@@ -75,7 +75,7 @@ public interface BeanPostProcessor {
      * 将此BeanPostProcessor应用于给定的新bean实例。 该bean将已经被属性值填充。返回的bean实例可能是原始对象的包装。
      *
      * 对于FactoryBean，该回调将同时应用于FactoryBean实例和由FactoryBean创建的对象（如 2.0版）。
-     * 后处理器可以通过相应的{@code bean instanceof FactoryBean}检查来决定是应用到FactoryBean还是其创建的对象，还是两者都应用。
+     * 后处理器可以通过相应的{@code bean instanceof FactoryBean}检查来决定是者应用到FactoryBean还是其创建的对象，还是两都应用。
      * 与所有其他BeanPostProcessor回调相反，此回调还将在{@link InstantiationAwareBeanPostProcessor#postProcessBeforeInstantiation}方法触发短路后被调用。
      *
      * @param bean     the new bean instance

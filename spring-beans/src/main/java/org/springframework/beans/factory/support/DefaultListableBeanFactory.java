@@ -111,7 +111,7 @@ import org.springframework.util.StringUtils;
  */
 //DefaultListableBeanFactory 为最终默认实现，
 // 它实现了所有接口:ListableBeanFactory、HierarchicalBeanFactory 和 AutowireCapableBeanFactory
-
+// 实现了BeanDefinitionRegistry接口，因此是具有注册功能的完整bean工厂
 @SuppressWarnings("serial")
 public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFactory
         implements ConfigurableListableBeanFactory, BeanDefinitionRegistry, Serializable {
@@ -119,7 +119,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
     private static Class<?> javaUtilOptionalClass = null;
 
     private static Class<?> javaxInjectProviderClass = null;
-
+    // 静态块
     static {
         try {
             javaUtilOptionalClass =
@@ -173,7 +173,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
     private final Map<Class<?>, Object> resolvableDependencies = new HashMap<Class<?>, Object>(16);
 
     /**
-     * bean 定义 对象的 Map 集合，通过 bean 名称 键入；
+     * BeanDefinition对象的 Map 集合，通过 bean 名称 键入； ConcurrentHashMap做单例池
      */
     private final Map<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap<String, BeanDefinition>(64);
 
@@ -823,15 +823,17 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
         }
     }
 
+  // ---------------------------------------------------------------------
+  // Implementation of BeanDefinitionRegistry interface
+  // 使用ConcurrentHashMap 数据结构来存储注册的 BeanDefinition。
+  // private final Map<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap<String,BeanDefinition>(64);
+  // 标识（beanName）集合
+  // private final List<String> beanDefinitionNames = new ArrayList<String>(64);
+  // ---------------------------------------------------------------------
 
-    //---------------------------------------------------------------------
-    // Implementation of BeanDefinitionRegistry interface
-    //---------------------------------------------------------------------
-
-    @Override
-    public void registerBeanDefinition(String beanName, BeanDefinition beanDefinition)
-            throws BeanDefinitionStoreException {
-
+  @Override
+  public void registerBeanDefinition(String beanName, BeanDefinition beanDefinition)
+      throws BeanDefinitionStoreException {
         //简单的非null判断
         Assert.hasText(beanName, "Bean name must not be empty");
         Assert.notNull(beanDefinition, "BeanDefinition must not be null");

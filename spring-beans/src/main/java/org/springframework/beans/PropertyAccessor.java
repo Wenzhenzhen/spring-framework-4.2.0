@@ -21,9 +21,8 @@ import org.springframework.core.convert.TypeDescriptor;
 import java.util.Map;
 
 /**
- * Common interface for classes that can access named properties
- * (such as bean properties of an object or fields in an object)
- * Serves as base interface for {@link BeanWrapper}.
+ * Common interface for classes that can access named properties (such as bean properties of an
+ * object or fields in an object) Serves as base interface for {@link BeanWrapper}.
  *
  * @author Juergen Hoeller
  * @since 1.1
@@ -31,7 +30,12 @@ import java.util.Map;
  * @see PropertyAccessorFactory#forBeanPropertyAccess
  * @see PropertyAccessorFactory#forDirectFieldAccess
  */
-//对属性的修改或获取。
+// 对属性的修改或获取,主要有四类方法:
+// 1. isReadableProperty()：判断指定 property 是否可读，是否包含 getter 方法
+// 2. isWritableProperty()：判断指定 property 是否可写,是否包含 setter 方法
+// 3. getPropertyType()：获取指定 propertyName 的类型
+// 4. setPropertyValue()：设置指定 propertyValue
+
 public interface PropertyAccessor {
 
 	/**

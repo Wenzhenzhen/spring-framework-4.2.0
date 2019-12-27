@@ -29,6 +29,7 @@ import org.springframework.util.ClassUtils;
  * @see PropertySources
  * @see AbstractEnvironment
  */
+// PropertyResolver 的实现者，他对一组 PropertySources 提供属性解析服务
 public class PropertySourcesPropertyResolver extends AbstractPropertyResolver {
 
 	private final PropertySources propertySources;

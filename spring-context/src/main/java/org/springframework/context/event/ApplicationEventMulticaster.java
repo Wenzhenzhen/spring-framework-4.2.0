@@ -32,7 +32,9 @@ import org.springframework.core.ResolvableType;
  * @author Juergen Hoeller
  * @author Stephane Nicoll
  */
-//帮助ApplicationContext管理ApplicationListener，并向它们发布事件。
+// 帮助ApplicationContext管理ApplicationListener，并向它们发布事件。
+// 提供添加，删除，监听的方法；并向监听器广播事件
+
 public interface ApplicationEventMulticaster {
 
 	/**
